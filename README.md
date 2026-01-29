@@ -1,10 +1,8 @@
 # cultivate-mapping-pipeline
 
-# Public-safe documentation of the mapping and analysis pipeline developed in WP2 of the EU Horizon Europe project CULTIVATE.
-
 ## Purpose of this repository
 
-This repository documents an end-to-end data pipeline for mapping and analysing
+Public-safe documentation of the mapping and analysis pipeline developed in WP2 of the EU Horizon Europe project CULTIVATE: This repository documents an end-to-end data pipeline for mapping and analysing
 urban food sharing initiatives, developed as part of the CULTIVATE project.
 
 It focuses on:
@@ -71,5 +69,3 @@ Wu, H., Cho, H., Davies, A. R., & Jones, G. J. F. (2024).
 _LLM-based Automated Web Retrieval and Text Classification of Food Sharing Initiatives_.
 In _Proceedings of the 33rd ACM International Conference on Information and Knowledge Management (CIKM ’24)_.
 DOI: 10.1145/3627673.3680090
-
-> > > > > > > 699e276 (Initial structure and documentation for CULTIVATE mapping pipeline)

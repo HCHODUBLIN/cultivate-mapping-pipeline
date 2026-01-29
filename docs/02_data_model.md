@@ -2,16 +2,15 @@
 
 ```mermaid
 flowchart LR
-  A[City list + multilingual food sharing vocabulary] --> B[Query formation & expansion]
-  B --> C[Web search (API) → candidate URLs]
+  A[City list and multilingual food sharing vocabulary] --> B[Query formation and expansion]
+  B --> C[Web search (API): candidate URLs]
   C --> D[Blacklist filtering]
-  D --> E[Web scraping: target page + about page]
-  E --> F[Text normalisation + metadata extraction]
+  D --> E[Web scraping: target page and about page]
+  E --> F[Text normalisation and metadata extraction]
   F --> G[LLM-based FSI classification]
-  G --> H[(FSI database: positive + negative records)]
-  H --> I[Scheduled re-runs: avoid re-classifying known URLs]
+  G --> H[(FSI database: positive and negative records)]
+  H --> I[Scheduled re-runs to avoid re-classifying known URLs]
   H --> J[Presentation layer (platform)]
-```
 
 ## Automation output (public-safe data contract)
 
@@ -67,3 +66,4 @@ them through scraping and LLM-based classification. The downstream pipeline
 
 - Both positive and negative classifications are retained to avoid repeated re-classification.
 - Scheduled incremental runs (e.g. monthly) may filter previously seen URLs. Domain-aware exceptions may apply (e.g. platform-hosted pages).
+```
