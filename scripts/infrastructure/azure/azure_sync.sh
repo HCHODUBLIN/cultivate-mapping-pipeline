@@ -2,10 +2,23 @@
 # Azure Blob Storage Sync Script
 # Quick commands for syncing data between local and Azure Blob
 
-# Configuration
-STORAGE_ACCOUNT="your_storage_account_name"  # ← 너의 Storage Account 이름으로 바꿔
-CONTAINER="cultivatedata"
-LOCAL_DIR="/Users/hyunjicho/Documents/cultivate-mapping-pipeline/data_azure_sync"
+# Load environment variables from .env file
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
+# Configuration from environment variables
+STORAGE_ACCOUNT="${AZURE_STORAGE_ACCOUNT_NAME:-cultivatedata}"
+CONTAINER="${AZURE_CONTAINER_NAME:-data}"
+LOCAL_DIR="${AZURE_LOCAL_SYNC_DIR:-./data_azure_sync}"
+STORAGE_KEY="${AZURE_STORAGE_KEY}"
+
+# Check if STORAGE_KEY is set
+if [ -z "$STORAGE_KEY" ]; then
+    echo "Error: AZURE_STORAGE_KEY not set in .env file"
+    echo "Please create a .env file from .env.example and add your Azure Storage Key"
+    exit 1
+fi
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -19,7 +32,7 @@ list_blobs() {
     az storage blob list \
         --account-name $STORAGE_ACCOUNT \
         --container-name $CONTAINER \
-        --auth-mode login \
+        --account-key "$STORAGE_KEY" \
         --output table
 }
 
@@ -30,7 +43,7 @@ download_all() {
         --account-name $STORAGE_ACCOUNT \
         --source $CONTAINER \
         --destination "$LOCAL_DIR" \
-        --auth-mode login
+        --account-key "$STORAGE_KEY"
     echo -e "${GREEN}✓ Download complete!${NC}"
 }
 
@@ -43,7 +56,7 @@ download_folder() {
         --source $CONTAINER \
         --destination "$LOCAL_DIR" \
         --pattern "${folder}/*" \
-        --auth-mode login
+        --account-key "$STORAGE_KEY"
     echo -e "${GREEN}✓ Download complete!${NC}"
 }
 
@@ -54,7 +67,8 @@ upload_all() {
         --account-name $STORAGE_ACCOUNT \
         --destination $CONTAINER \
         --source "$source_dir" \
-        --auth-mode login
+        --account-key "$STORAGE_KEY" \
+        --overwrite
     echo -e "${GREEN}✓ Upload complete!${NC}"
 }
 
@@ -67,6 +81,26 @@ sync_to_azure() {
     local source_dir=$1
     echo -e "${BLUE}Syncing from local to Azure...${NC}"
     upload_all "$source_dir"
+}
+
+# Upload single file (preserves folder structure)
+upload_file() {
+    local local_file=$1
+    local remote_path=$2
+
+    if [ -z "$remote_path" ]; then
+        remote_path=$(basename "$local_file")
+    fi
+
+    echo -e "${BLUE}Uploading: ${local_file} → ${remote_path}${NC}"
+    az storage blob upload \
+        --account-name $STORAGE_ACCOUNT \
+        --container-name $CONTAINER \
+        --file "$local_file" \
+        --name "$remote_path" \
+        --account-key "$STORAGE_KEY" \
+        --overwrite
+    echo -e "${GREEN}✓ Uploaded${NC}"
 }
 
 # Main

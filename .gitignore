@@ -235,4 +235,4 @@ snowflake/02_stages.sql
 *.sql.secret
 
 # Azure credentials
-.azure/
+.azure/*.docx

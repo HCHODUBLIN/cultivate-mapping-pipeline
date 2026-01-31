@@ -60,3 +60,145 @@ sources:
             description: Source file name
           - name: loaded_at
             description: Timestamp when data was loaded
+      - name: raw_cultivate_api
+        description: JSON outputs from CULTIVATE 2026 discovery system
+        columns:
+          - name: raw_json
+            description: Full JSON payload from automation tool
+          - name: file_name
+            description: Source file name
+          - name: loaded_at
+            description: Timestamp when record was loaded
+
+      - name: gold_fsi_final
+        description: Final deduplicated FSI dataset (Gold layer) - 105 cities
+        columns:
+          - name: id
+            description: Unique FSI identifier
+          - name: name
+            description: FSI name
+          - name: url
+            description: FSI website URL
+          - name: facebook_url
+            description: Facebook URL
+          - name: x_url
+            description: X (Twitter) URL
+          - name: instagram_url
+            description: Instagram URL
+          - name: food_sharing_activities
+            description: Array of food sharing activities (Distribution, Growing, Cooking & Eating)
+          - name: how_it_is_shared
+            description: Array of sharing modes (Gifting, Selling, Bartering, etc.)
+          - name: country
+            description: Country name
+          - name: city
+            description: City name
+          - name: lng
+            description: Longitude
+          - name: lat
+            description: Latitude
+
+      - name: bronze_sharecity200_raw
+        description: |
+          ShareCity200 pre-deduplication export (3,140 FSIs)
+          Used as baseline for 105 cities automated mapping
+          Compare with gold_fsi_final to analyze deduplication impact
+        columns:
+          - name: country
+            description: Country name
+          - name: city
+            description: City name
+          - name: name
+            description: FSI name
+          - name: url
+            description: FSI website URL
+          - name: instagram_url
+            description: Instagram profile URL
+          - name: twitter_url
+            description: Twitter profile URL
+          - name: facebook_url
+            description: Facebook profile URL
+          - name: food_sharing_activities
+            description: JSON string array of activities
+          - name: how_it_is_shared
+            description: JSON string array of sharing modes
+          - name: lon
+            description: Longitude
+          - name: lat
+            description: Latitude
+          - name: comments
+            description: Manual review comments
+          - name: date_checked
+            description: Date when FSI was last checked
+          - name: date_modified
+            description: Timestamp when record was last modified
+
+  # Analysis source tables (2025/02 - Prompt Engineering)
+  - name: analysis
+    database: cultivate_db
+    schema: public
+    description: Analysis and filtering results from prompt engineering tests
+    tables:
+      - name: raw_fsi_filter_results
+        description: LLM filter decisions (include/exclude) for FSI classification
+        columns:
+          - name: url_id
+            description: Unique identifier for URL (host__hash)
+          - name: decision
+            description: LLM decision (include or exclude)
+          - name: city
+            description: City name
+          - name: url
+            description: Full URL
+          - name: loaded_at
+            description: Timestamp when filtered
+
+      - name: raw_scrape_summary
+        description: Summary of scraped text files with metadata
+        columns:
+          - name: city
+            description: City name
+          - name: url
+            description: Full URL
+          - name: url_id
+            description: Unique identifier (matches filter results)
+          - name: text_file
+            description: Path to scraped text file
+          - name: row_index
+            description: Row index in source Excel
+          - name: source_excel
+            description: Original Excel filename
+          - name: folder
+            description: Folder name (filtered/original/verified)
+
+      - name: raw_manual_verification
+        description: Manual verification results from 2025/01 test (105 cities, 5 rounds)
+        columns:
+          - name: city
+            description: City name
+          - name: url
+            description: Full URL
+          - name: name
+            description: FSI name
+          - name: is_valid
+            description: Whether URL is valid FSI (TRUE/FALSE)
+          - name: fp_category
+            description: False positive category (VALID, FP_MEDIA, FP_COMMERCIAL, etc)
+          - name: comments
+            description: Manual review comments (FP reasoning)
+          - name: activities
+            description: Food sharing activities
+          - name: how_shared
+            description: How food is shared
+          - name: round_version
+            description: Automation round version (v1.0.0, v1.1.0, v1.2.0, v1.3.0, v2.0.0)
+          - name: verified_date
+            description: Date when manual verification was performed
+          - name: lat
+            description: Latitude
+          - name: lon
+            description: Longitude
+          - name: file_name
+            description: Source file name
+          - name: loaded_at
+            description: Timestamp when data was loaded

@@ -8,11 +8,21 @@ import os
 from pathlib import Path
 from azure.storage.blob import BlobServiceClient
 from azure.identity import DefaultAzureCredential
+from dotenv import load_dotenv
 
-# Configuration
-STORAGE_ACCOUNT_NAME = "your_storage_account_name"  # 너의 Storage Account 이름
-CONTAINER_NAME = "cultivatedata"
-LOCAL_BASE_DIR = Path(__file__).parent.parent / "data_reviewed"
+# Load environment variables
+load_dotenv()
+
+# Configuration from environment variables
+STORAGE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+CONTAINER_NAME = os.getenv("AZURE_CONTAINER_NAME", "cultivatedata")
+LOCAL_BASE_DIR = Path(os.getenv("AZURE_LOCAL_SYNC_DIR", "./data_azure_sync"))
+
+if not STORAGE_ACCOUNT_NAME:
+    raise RuntimeError(
+        "❌ AZURE_STORAGE_ACCOUNT_NAME not found. "
+        "Please create a .env file from .env.example and set your Azure Storage Account name."
+    )
 
 def get_blob_service_client():
     """Get authenticated blob service client"""
