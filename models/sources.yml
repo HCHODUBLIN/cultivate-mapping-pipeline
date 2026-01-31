@@ -1,0 +1,62 @@
+version: 2
+
+sources:
+  - name: cultivate
+    description: Raw tables for CULTIVATE mapping pipeline data
+    database: cultivate_db  # Update with your Snowflake database name
+    schema: public  # Update with your Snowflake schema name
+
+    tables:
+      - name: raw_ground_truth
+        description: Ground truth URLs manually collected
+        columns:
+          - name: ground_truth_id
+            description: Unique identifier for ground truth records
+          - name: city
+            description: City name
+          - name: source_url
+            description: Original source URL
+          - name: file_name
+            description: Source file name
+          - name: loaded_at
+            description: Timestamp when data was loaded
+
+      - name: raw_automation
+        description: URLs found by automation scripts
+        columns:
+          - name: automation_id
+            description: Unique identifier for automation records
+          - name: city
+            description: City name
+          - name: run_id
+            description: Automation run identifier (includes version)
+          - name: source_url
+            description: Original source URL
+          - name: file_name
+            description: Source file name
+          - name: loaded_at
+            description: Timestamp when data was loaded
+
+      - name: raw_automation_reviewed
+        description: Review decisions for automation results
+        columns:
+          - name: automation_id
+            description: Links to raw_automation
+          - name: is_included
+            description: Whether URL should be included (TRUE/FALSE as string)
+          - name: file_name
+            description: Source file name
+          - name: loaded_at
+            description: Timestamp when data was loaded
+
+      - name: raw_city_language
+        description: Language mapping for each city
+        columns:
+          - name: city
+            description: City name
+          - name: search_language
+            description: Primary search language for the city
+          - name: file_name
+            description: Source file name
+          - name: loaded_at
+            description: Timestamp when data was loaded

@@ -1,0 +1,12 @@
+-- 02_stages.sql.template
+-- Template: environment-specific external stage definition
+-- This script defines an external stage pointing to an Azure Blob container.
+-- Credentials (e.g. SAS token) must be configured locally before execution.
+
+CREATE OR REPLACE STAGE stg_azure_raw
+  URL=''
+  CREDENTIALS=(AZURE_SAS_TOKEN='')
+  FILE_FORMAT = ff_json_strip_array;
+
+-- Quick visibility check
+LIST @stg_azure_raw;

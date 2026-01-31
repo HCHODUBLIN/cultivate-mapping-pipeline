@@ -205,3 +205,34 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# local / private data
+data/
+*.csv
+*.xlsx
+
+# macOS
+.DS_Store
+
+# Claude AI
+.claude/
+
+# Generated outputs and reports
+reports/
+analysis/**/*.png
+analysis/**/*.txt
+!analysis/**/requirements.txt
+
+# dbt
+target/
+dbt_packages/
+logs/
+dbt_modules/
+
+# Snowflake credentials and environment-specific files
+snowflake/02_stages.sql
+*_credentials.sql
+*.sql.secret
+
+# Azure credentials
+.azure/
