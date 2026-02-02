@@ -12,14 +12,23 @@ sources:
         columns:
           - name: ground_truth_id
             description: Unique identifier for ground truth records
+            tests:
+              - unique
+              - not_null
           - name: city
             description: City name
+            tests:
+              - not_null
           - name: source_url
             description: Original source URL
+            tests:
+              - not_null
           - name: file_name
             description: Source file name
           - name: loaded_at
             description: Timestamp when data was loaded
+            tests:
+              - not_null
 
       - name: raw_automation
         description: URLs found by automation scripts
@@ -71,14 +80,25 @@ sources:
             description: Timestamp when record was loaded
 
       - name: gold_fsi_final
-        description: Final deduplicated FSI dataset (Gold layer) - 105 cities
+        description: Final deduplicated FSI dataset (Gold layer) - 105 cities, 3,052 FSIs
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "(select count(*) from {{ ref('gold_fsi_final') }}) = 3052"
+              name: gold_fsi_final_total_count_check
         columns:
           - name: id
             description: Unique FSI identifier
+            tests:
+              - unique
+              - not_null
           - name: name
             description: FSI name
+            tests:
+              - not_null
           - name: url
             description: FSI website URL
+            tests:
+              - not_null
           - name: facebook_url
             description: Facebook URL
           - name: x_url
@@ -91,8 +111,12 @@ sources:
             description: Array of sharing modes (Gifting, Selling, Bartering, etc.)
           - name: country
             description: Country name
+            tests:
+              - not_null
           - name: city
             description: City name
+            tests:
+              - not_null
           - name: lng
             description: Longitude
           - name: lat
@@ -103,15 +127,27 @@ sources:
           ShareCity200 pre-deduplication export (3,140 FSIs)
           Used as baseline for 105 cities automated mapping
           Compare with gold_fsi_final to analyze deduplication impact
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "(select count(*) from {{ source('cultivate', 'bronze_sharecity200_raw') }}) = 3140"
+              name: bronze_sharecity200_total_count_check
         columns:
           - name: country
             description: Country name
+            tests:
+              - not_null
           - name: city
             description: City name
+            tests:
+              - not_null
           - name: name
             description: FSI name
+            tests:
+              - not_null
           - name: url
             description: FSI website URL
+            tests:
+              - not_null
           - name: instagram_url
             description: Instagram profile URL
           - name: twitter_url

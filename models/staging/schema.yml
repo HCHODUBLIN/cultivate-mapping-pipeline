@@ -1,0 +1,126 @@
+version: 2
+
+models:
+  - name: stg_automation
+    description: Cleaned automation URLs with normalized fields
+    columns:
+      - name: automation_id
+        description: Unique identifier for automation records
+        tests:
+          - unique
+          - not_null
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: source_url
+        description: Original source URL
+        tests:
+          - not_null
+
+  - name: stg_automation_enhanced
+    description: Automation URLs with normalized URLs and domain extraction
+    columns:
+      - name: automation_id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: normalized_url
+        description: Normalized URL (lowercase, no www/https)
+        tests:
+          - not_null
+      - name: domain
+        description: Extracted domain
+        tests:
+          - not_null
+
+  - name: stg_automation_review
+    description: Manual review decisions for automation results
+    columns:
+      - name: automation_id
+        description: Links to stg_automation
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_automation')
+              field: automation_id
+      - name: is_included
+        description: Whether URL is a valid FSI (BOOLEAN)
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+  - name: stg_ground_truth
+    description: Cleaned ground truth URLs
+    columns:
+      - name: ground_truth_id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: source_url
+        description: Ground truth URL
+        tests:
+          - not_null
+
+  - name: stg_ground_truth_enhanced
+    description: Ground truth with normalized URLs
+    columns:
+      - name: ground_truth_id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: normalized_url
+        description: Normalized URL
+        tests:
+          - not_null
+
+  - name: stg_city_language
+    description: Language mapping for each city
+    columns:
+      - name: city
+        description: City name (should be unique per city)
+        tests:
+          - unique
+          - not_null
+      - name: search_language
+        description: Primary search language
+        tests:
+          - not_null
+
+  - name: stg_manual_verification
+    description: Manual verification results from 105 cities, 5 rounds
+    columns:
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: url
+        description: Full URL
+        tests:
+          - not_null
+      - name: is_valid
+        description: Whether URL is a valid FSI
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      - name: round_version
+        description: Automation round version
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['v1.0.0', 'v1.1.0', 'v1.2.0', 'v1.3.0', 'v2.0.0']
+      - name: fp_category
+        description: False positive categorization
+        tests:
+          - accepted_values:
+              values: ['VALID', 'FP_MEDIA', 'FP_COMMERCIAL', 'FP_CROWDFUNDING', 'FP_MUSEUM', 'FP_OTHER']
+              quote: true

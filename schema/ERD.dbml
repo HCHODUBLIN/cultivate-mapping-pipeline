@@ -1,0 +1,325 @@
+// CULTIVATE Mapping Pipeline - Entity Relationship Diagram
+// Paste this into https://dbdiagram.io to visualize
+// Documentation: https://dbml.dbdiagram.io/docs
+
+Project CULTIVATE_Pipeline {
+  database_type: 'Snowflake'
+  Note: '''
+    # CULTIVATE FSI Mapping Pipeline
+    Medallion Architecture: Bronze → Silver → Gold
+
+    ## Data Flow
+    1. **Bronze Layer**: Raw data ingestion (raw_*)
+    2. **Silver Layer**: Cleaned & transformed (stg_*)
+    3. **Gold Layer**: Business-ready marts (mart_*, fsi_*)
+
+    ## Key Features
+    - URL normalization as MDM (Master Data Management)
+    - Multi-strategy deduplication (exact, URL, fuzzy)
+    - Confidence scoring for uncertainty management
+    - Regional cluster analysis (Southern, Western, Northern, Eastern Europe)
+  '''
+}
+
+// ====================================
+// BRONZE LAYER - Raw Data Ingestion
+// ====================================
+
+Table raw_automation {
+  automation_id varchar [pk, note: 'Unique identifier']
+  city varchar [not null]
+  run_id varchar [note: 'Automation version (v1.0.0-v2.0.0)']
+  source_url varchar [not null]
+  file_name varchar
+  loaded_at timestamp [default: `current_timestamp()`]
+
+  Note: 'URLs discovered by automation across 5 rounds'
+}
+
+Table raw_automation_reviewed {
+  automation_id varchar [pk, ref: > raw_automation.automation_id]
+  is_included varchar [not null, note: 'TRUE/FALSE as string']
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Manual review decisions for automation results'
+}
+
+Table raw_ground_truth {
+  ground_truth_id varchar [pk]
+  city varchar [not null]
+  source_url varchar [not null]
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Manually collected ground truth URLs for validation'
+}
+
+Table raw_city_language {
+  city varchar [pk]
+  search_language varchar [not null]
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Language mapping for multi-lingual search queries'
+}
+
+Table raw_manual_verification {
+  city varchar [not null]
+  url varchar [not null]
+  name varchar
+  is_valid boolean [not null]
+  fp_category varchar [note: 'VALID, FP_MEDIA, FP_COMMERCIAL, etc.']
+  comments varchar
+  activities varchar
+  how_shared varchar
+  round_version varchar [not null, note: 'v1.0.0-v2.0.0']
+  verified_date date
+  lat float
+  lon float
+  file_name varchar
+  loaded_at timestamp
+
+  indexes {
+    (city, round_version) [name: 'idx_manual_city_round']
+  }
+
+  Note: 'Manual verification results: 105 cities, 5 rounds'
+}
+
+Table bronze_sharecity200_raw {
+  country varchar [not null]
+  city varchar [not null]
+  name varchar [not null]
+  url varchar [not null]
+  instagram_url varchar
+  twitter_url varchar
+  facebook_url varchar
+  food_sharing_activities varchar [note: 'JSON array']
+  how_it_is_shared varchar [note: 'JSON array']
+  lon float
+  lat float
+  comments varchar
+  date_checked varchar
+  date_modified timestamp
+  _loaded_at timestamp
+
+  Note: 'Pre-deduplication data: 3,140 FSIs'
+}
+
+Table gold_fsi_final {
+  id varchar [pk]
+  name varchar [not null]
+  url varchar [not null]
+  facebook_url varchar
+  x_url varchar
+  instagram_url varchar
+  food_sharing_activities varchar [note: 'JSON array: Distribution, Growing, Cooking & Eating']
+  how_it_is_shared varchar [note: 'JSON array: Gifting, Selling, Bartering']
+  country varchar [not null]
+  city varchar [not null]
+  lng float
+  lat float
+
+  Note: 'Post-deduplication Gold layer: 3,052 FSIs (88 duplicates removed)'
+}
+
+// ====================================
+// SILVER LAYER - Staging Tables
+// ====================================
+
+Table stg_automation {
+  automation_id varchar [pk, ref: - raw_automation.automation_id]
+  city varchar [not null]
+  run_id varchar
+  source_url varchar [not null]
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Cleaned automation URLs'
+}
+
+Table stg_automation_enhanced {
+  automation_id varchar [pk, ref: - stg_automation.automation_id]
+  city varchar
+  run_id varchar
+  source_url varchar
+  normalized_url varchar [not null, note: 'MDM: lowercase, no www/https']
+  domain varchar [not null, note: 'Extracted domain for dedup']
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'URL normalization for deduplication'
+}
+
+Table stg_automation_review {
+  automation_id varchar [pk, ref: - stg_automation.automation_id]
+  is_included boolean [not null]
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Cleaned review decisions (converted to BOOLEAN)'
+}
+
+Table stg_ground_truth {
+  ground_truth_id varchar [pk, ref: - raw_ground_truth.ground_truth_id]
+  city varchar [not null]
+  source_url varchar [not null]
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Cleaned ground truth'
+}
+
+Table stg_ground_truth_enhanced {
+  ground_truth_id varchar [pk, ref: - stg_ground_truth.ground_truth_id]
+  city varchar
+  source_url varchar
+  normalized_url varchar [not null]
+  domain varchar [not null]
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Ground truth with URL normalization'
+}
+
+Table stg_manual_verification {
+  city varchar [not null]
+  url varchar [not null]
+  name varchar
+  is_valid boolean [not null]
+  fp_category varchar
+  comments varchar
+  activities varchar
+  how_shared varchar
+  round_version varchar [not null]
+  verified_date date
+  lat float
+  lon float
+  file_name varchar
+  loaded_at timestamp
+
+  Note: 'Cleaned manual verification (105 cities, 5 rounds)'
+}
+
+// ====================================
+// GOLD LAYER - Business Marts
+// ====================================
+
+Table fsi_city_summary {
+  city varchar [pk]
+  country varchar [not null]
+  fsi_count int [not null, note: 'Total FSIs in city']
+  population_2023 int [note: 'City population']
+  fsis_per_100k float [not null, note: 'FSI density metric']
+  cluster varchar [not null, note: 'Regional cluster']
+  avg_lat float
+  avg_lng float
+  has_coords boolean [not null]
+
+  Note: 'City-level FSI statistics for Power BI dashboard'
+}
+
+Table fsi_cluster_analysis {
+  cluster varchar [pk, note: 'Southern/Western/Northern/Eastern Europe']
+  cities_count int [not null]
+  total_fsis int [not null]
+  avg_fsis_per_city float [not null]
+  total_population bigint
+  avg_fsis_per_100k float [not null]
+
+  Note: 'Regional cluster aggregation'
+}
+
+Table fsi_activity_summary {
+  activity varchar [pk, note: 'Distribution, Growing, Cooking & Eating']
+  fsi_count int [not null]
+  total_fsis int [not null, note: 'Should be 3052']
+  pct_of_total float [not null]
+
+  Note: 'Activity breakdown using lateral flatten on JSON arrays'
+}
+
+Table fsi_deduplication_impact {
+  city varchar [pk]
+  fsi_count_before int [not null, note: 'Bronze: 3,140']
+  fsi_count_after int [not null, note: 'Gold: 3,052']
+  duplicates_removed int [not null, note: '88 duplicates']
+  dedup_rate_pct float [note: '2.8% deduplication rate']
+
+  Note: 'Pre vs post deduplication comparison'
+}
+
+Table accuracy_comparison {
+  city varchar
+  round_version varchar [note: 'v1.0.0-v2.0.0']
+  round_number int [note: '1-5']
+  manual_urls_checked int
+  manual_valid_fsis int
+  manual_accuracy_pct float
+  total_automation_results int
+  automation_valid int
+  automation_accuracy_pct float [note: '32% → 74% improvement']
+  accuracy_improvement float
+  pct_improvement float
+
+  indexes {
+    (city, round_version) [name: 'idx_accuracy_city_round']
+  }
+
+  Note: 'Automation accuracy: 32% (v1.0.0) → 74% (v2.0.0 agent-based)'
+}
+
+Table manual_verification_summary {
+  city varchar
+  round_version varchar
+  round_number int
+  total_urls_checked int [not null]
+  valid_fsis int [not null]
+  false_positives int
+  accuracy_pct float [not null]
+
+  Note: 'Aggregated manual verification by city and round'
+}
+
+Table fp_pattern_analysis {
+  fp_category varchar [pk, note: 'VALID, FP_MEDIA, FP_COMMERCIAL, FP_CROWDFUNDING, FP_MUSEUM, FP_OTHER']
+  total_count int [not null]
+  pct_of_total float [not null]
+
+  Note: 'False positive pattern analysis for prompt engineering'
+}
+
+Table mart_pipeline_eval {
+  city varchar [pk]
+  true_positives int [not null]
+  false_positives int [not null]
+  false_negatives int [not null]
+  precision float [note: 'TP / (TP + FP)']
+  recall float [note: 'TP / (TP + FN)']
+  f1_score float [note: 'Harmonic mean of precision & recall']
+
+  Note: 'Pipeline quality metrics per city'
+}
+
+Table mart_mapping_comparison {
+  city varchar [pk]
+  automation_count int
+  ground_truth_count int
+  overlap_count int
+  automation_only int
+  ground_truth_only int
+
+  Note: 'City-level automation vs ground truth comparison'
+}
+
+// ====================================
+// Relationships
+// ====================================
+
+// Bronze → Silver relationships defined above with ref: -
+
+// Gold layer relationships
+Ref: fsi_city_summary.city > gold_fsi_final.city
+Ref: fsi_deduplication_impact.city > gold_fsi_final.city
+Ref: stg_manual_verification.city > fsi_city_summary.city

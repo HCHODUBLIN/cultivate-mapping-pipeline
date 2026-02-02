@@ -219,9 +219,10 @@ data/
 
 # Generated outputs and reports
 reports/
-analysis/**/*.png
-analysis/**/*.txt
-!analysis/**/requirements.txt
+paper/
+exploration/**/*.png
+exploration/**/*.txt
+!exploration/**/requirements.txt
 
 # dbt
 target/
@@ -236,3 +237,6 @@ snowflake/02_stages.sql
 
 # Azure credentials
 .azure/*.docx
+
+# Paper build artifacts
+paper/output/

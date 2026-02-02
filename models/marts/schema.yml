@@ -1,0 +1,295 @@
+version: 2
+
+models:
+  # FSI Landscape Analysis Models
+  - name: fsi_city_summary
+    description: |
+      City-level FSI statistics with population metrics
+      Used for Power BI dashboard and regional analysis
+    columns:
+      - name: city
+        description: City name
+        tests:
+          - unique
+          - not_null
+      - name: country
+        description: Country name
+        tests:
+          - not_null
+      - name: fsi_count
+        description: Number of FSIs in the city
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: population_2023
+        description: City population in 2023
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: fsis_per_100k
+        description: FSIs per 100,000 population
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: cluster
+        description: Regional cluster assignment
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Southern Europe', 'Western Europe', 'Northern Europe', 'Eastern Europe']
+      - name: has_coords
+        description: Whether city has geographic coordinates
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+  - name: fsi_cluster_analysis
+    description: |
+      Regional cluster aggregation
+      Groups cities into Southern, Western, Northern, Eastern Europe
+    columns:
+      - name: cluster
+        description: Regional cluster name
+        tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ['Southern Europe', 'Western Europe', 'Northern Europe', 'Eastern Europe']
+      - name: cities_count
+        description: Number of cities in cluster
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              inclusive: true
+      - name: total_fsis
+        description: Total FSIs in cluster
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: avg_fsis_per_city
+        description: Average FSIs per city in cluster
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: avg_fsis_per_100k
+        description: Average FSIs per 100k population
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+
+  - name: fsi_activity_summary
+    description: |
+      Food sharing activities and modes breakdown
+      Parses JSON arrays using lateral flatten
+    columns:
+      - name: activity
+        description: Food sharing activity type
+        tests:
+          - not_null
+      - name: fsi_count
+        description: Number of FSIs with this activity
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              inclusive: true
+      - name: total_fsis
+        description: Total FSIs in dataset (should be 3052)
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "= 3052"
+
+  - name: fsi_deduplication_impact
+    description: |
+      Pre vs post deduplication comparison
+      Bronze (3,140) vs Gold (3,052) with 88 duplicates removed
+    columns:
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: fsi_count_before
+        description: FSI count before deduplication
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: fsi_count_after
+        description: FSI count after deduplication
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: duplicates_removed
+        description: Number of duplicates removed
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: dedup_rate_pct
+        description: Deduplication rate percentage
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+
+  # Pipeline Evaluation Models
+  - name: accuracy_comparison
+    description: |
+      Automation vs manual verification accuracy comparison
+      Shows improvement from 32% → 74% through agent-based approach
+    columns:
+      - name: city
+        description: City name or 'All Cities'
+        tests:
+          - not_null
+      - name: round_version
+        description: Automation version
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['v1.0.0', 'v1.1.0', 'v1.2.0', 'v1.3.0', 'v2.0.0']
+      - name: round_number
+        description: Round number (1-5)
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 5
+              inclusive: true
+      - name: manual_accuracy_pct
+        description: Manual verification accuracy percentage
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+      - name: automation_accuracy_pct
+        description: Automation accuracy percentage
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+      - name: accuracy_improvement
+        description: Percentage point improvement
+      - name: pct_improvement
+        description: Percent improvement relative to baseline
+
+  - name: manual_verification_summary
+    description: |
+      Aggregated manual verification results
+      105 cities across 5 automation rounds
+    columns:
+      - name: city
+        description: City name or 'All Rounds'
+        tests:
+          - not_null
+      - name: round_version
+        description: Automation version or 'All Rounds'
+        tests:
+          - not_null
+      - name: total_urls_checked
+        description: Total URLs manually checked
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: valid_fsis
+        description: Number of valid FSIs found
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: accuracy_pct
+        description: Validation accuracy percentage
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+
+  - name: fp_pattern_analysis
+    description: False positive categorization and patterns
+    columns:
+      - name: fp_category
+        description: False positive category
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['VALID', 'FP_MEDIA', 'FP_COMMERCIAL', 'FP_CROWDFUNDING', 'FP_MUSEUM', 'FP_OTHER']
+              quote: true
+      - name: total_count
+        description: Number of URLs in this category
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: pct_of_total
+        description: Percentage of total URLs
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+
+  - name: mart_mapping_comparison
+    description: Automation vs ground truth comparison by city
+    columns:
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: automation_count
+        description: URLs found by automation
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: ground_truth_count
+        description: URLs in ground truth
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+
+  - name: mart_mapping_comparison_total
+    description: Total automation vs ground truth comparison
+    columns:
+      - name: total_automation
+        description: Total automation URLs
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: total_ground_truth
+        description: Total ground truth URLs
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true

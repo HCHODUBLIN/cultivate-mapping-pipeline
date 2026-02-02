@@ -2,8 +2,7 @@
 
 ## Purpose of this repository
 
-This repository documents the production automation pipeline that underpins the
-**Food Sharing Map**, hosted on the **Sharing Solutions** platform
+This repository documents the production-grade data automation pipeline that underpins the **Food Sharing Map**, hosted on the **Sharing Solutions** platform
 (https://www.sharingsolutions.eu/).
 
 Although the pipeline was originally developed within the EU Horizon Europe
@@ -14,18 +13,29 @@ initiatives across cities.
 ## Key Achievements
 
 **Data Pipeline Impact:**
-- Automated discovery and classification of **105 cities** across Europe
+
+- Automated discovery and classification across **105 European cities**
 - Processes **~210,000 URLs** per iteration (~3GB unstructured text)
-- Improved classification accuracy from **32% → 69.6%** through iterative prompt engineering
+- Improved classification accuracy from **32% → 74%** (manual validation benchmark)
 
 **Technical Stack:**
+
 - **Snowflake** data warehouse with dbt transformations
 - **Azure Blob Storage** integration for scalable data handling
-- **Python** analysis pipeline with GPT-4o LLM integration
+- **Python** analysis pipeline with LLM-based classification (GPT-4o used in experiments)
 - **Bronze/Silver/Gold** medallion architecture for data quality
 
+**Data Architecture & Quality:**
+
+- **Entity Relationship Diagram** ([interactive ERD](schema/ERD.dbml)) documenting full data model
+- **Comprehensive dbt tests** ensuring data integrity across all layers
+- **URL normalization** as Master Data Management (MDM) for entity resolution
+- **Multi-strategy deduplication** (exact, URL-based, fuzzy matching with 92% similarity threshold)
+- **88 duplicates removed** (3,140 → 3,052 FSIs, 2.8% deduplication rate)
+
 **Research & Optimization:**
-- Designed and executed A/B testing for prompt variations ([analysis/legacy_2025/02](analysis/legacy_2025/02))
+
+- Designed and executed A/B testing for prompt variations ([exploration/legacy_2025/02](exploration/legacy_2025/02))
 - Reduced false positives through systematic exclusion rule refinement
 - Automated data validation and deduplication workflows
 
@@ -33,28 +43,35 @@ initiatives across cities.
 
 ## Scope and limitations
 
-This repository provides a public, security-safe representation of the Food
-Sharing Map and its associated analysis pipeline.
+This repository provides a public, security-safe representation of the Food Sharing Map and its associated analysis pipeline, with all sensitive components removed or abstracted.
 
 ## Repository structure
 
 This repository showcases both **production data engineering** and **analytical research** work:
 
 ### Production Pipeline
+
 - **`snowflake/`** - Production SQL scripts for data warehouse operations
 - **`models/`** - dbt transformation models (staging → intermediate → marts)
-- **`scripts/`** - Infrastructure and DevOps utilities
+  - **Data Quality Tests** ([schema.yml files](models/)) - Comprehensive dbt tests for all layers
+  - See [models/README.md](models/README.md) for detailed documentation
+- **`infra/`** - Infrastructure and DevOps utilities
   - `infrastructure/azure/` - Azure Blob Storage sync and CLI setup
   - `release/` - Release management scripts
-- **`docs/`** - Technical architecture and design documentation
+- **`schema/`** - Data model and ERD documentation
+  - **Data Model** ([data_model.md](schema/data_model.md)) - Conceptual model and Snowflake implementation
+  - **Entity Relationship Diagram** ([ERD.dbml](schema/ERD.dbml), [ERD.md](schema/ERD.md)) - Interactive data model visualization
+- **`governance/`** - Security policy and collaboration roles
 
 ### Research & Analysis
-- **`analysis/`** - Experimental work and optimization tests ([see details](analysis/README.md))
-  - Prompt engineering experiments with **+37% accuracy improvement**
-  - Manual verification workflows
-  - Systematic A/B testing methodology
+
+- **`exploration/`** - Experimental work and optimization tests ([see details](exploration/README.md))
+  - Agent-based architecture with **+42% accuracy improvement** (32% → 74%)
+  - Prompt engineering experiments and systematic A/B testing
+  - Manual verification workflows and deduplication analysis
 
 ### Data Organization
+
 - **`data/`** - Bronze/Silver/Gold medallion architecture (not tracked in git)
 - **`reports/`** - Generated analysis outputs and visualizations (not tracked in git)
 
@@ -71,6 +88,7 @@ are grouped by function and provided in public-safe form.
 This project uses a `.env` file to manage sensitive credentials. **Never commit real credentials to git.**
 
 1. Create your local `.env` file:
+
 ```bash
 # Copy the template
 cp .env.example .env
@@ -86,6 +104,40 @@ nano .env
    - `OPENAI_API_KEY` - OpenAI API key for classification
 
 The `.env` file is gitignored. Only the template (`.env.example`) is tracked.
+
+### Data Quality Testing
+
+Run comprehensive data quality tests using dbt:
+
+```bash
+# Install dbt with Snowflake adapter
+pip install dbt-snowflake
+
+# Install dbt_utils for custom tests
+dbt deps
+
+# Run all tests
+dbt test
+
+# Run tests for specific layers
+dbt test --select staging
+dbt test --select marts
+
+# Generate documentation with ERD
+dbt docs generate
+dbt docs serve  # View at http://localhost:8080
+```
+
+**Test Coverage:**
+
+- **Uniqueness**: Primary keys across all tables
+- **Not Null**: Critical fields (city, url, etc.)
+- **Relationships**: Foreign key integrity
+- **Accepted Values**: Categorical fields (round_version, fp_category, cluster)
+- **Accepted Range**: Numeric metrics (0-100 for percentages, ≥0 for counts)
+- **Custom Tests**: Total count checks (3,140 bronze, 3,052 gold)
+
+See [models/README.md](models/README.md) for detailed testing documentation.
 
 ### Not included
 

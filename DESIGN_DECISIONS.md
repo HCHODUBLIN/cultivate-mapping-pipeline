@@ -105,7 +105,7 @@ Stable, human-readable records used for analysis, visualisation, and delivery th
 
 These entities are linked through explicit foreign-key relationships, allowing the system to distinguish between discovery-level uncertainty and curated initiative-level knowledge.
 
-(Full schema definitions and data contracts are documented separately in `docs/00_data_model.md`.)
+(Full schema definitions and data contracts are documented separately in `schema/data_model.md`.)
 
 ---
 
