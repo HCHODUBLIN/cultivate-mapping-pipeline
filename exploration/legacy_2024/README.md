@@ -1,4 +1,4 @@
-# CIKM 2024 Evaluation Guide
+# 2024 Pipeline Evaluation Guide
 
 This guide explains how to use the two complementary analysis approaches for evaluating automation performance.
 
@@ -320,7 +320,4 @@ review. Domain-level is better for aggregated statistics.
 
 ## Contact
 
-For questions about the analysis pipeline:
-
-- See main README for project contacts
-- Check academic paper (Wu et al., 2024) for methodology details
+For questions about the analysis pipeline, see the main README for project contacts.

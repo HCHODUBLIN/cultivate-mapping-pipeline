@@ -28,11 +28,11 @@ exploration/
 
 ### 2024 Tests
 
-#### CIKM Paper Test
+#### Pipeline Evaluation
 
-- **Status:** Completed (initial test)
-- **Location:** Legacy scripts across early analysis folders
-- **Description:** Initial testing for CIKM conference paper
+- **Status:** Completed
+- **Location:** `legacy_2024/`
+- **Description:** Domain-level and similarity-based matching for recall/precision evaluation
 
 ---
 

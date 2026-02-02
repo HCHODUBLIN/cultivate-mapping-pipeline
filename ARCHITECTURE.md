@@ -3,6 +3,10 @@
 This document describes the end-to-end architecture of the Food Sharing Map automation pipeline, with a focus on data flow, persistence, and reuse.
 The system is designed to support large-scale, iterative execution with incremental updates and minimal redundant processing.
 
+## My role
+
+As Data Solution Architect and Systems Design Lead for Sharing Solutions, I led the collaborative design and review of the end-to-end system architecture across the WP2 team.
+
 ## Pipeline overview (upstream)
 
 ```mermaid
@@ -119,7 +123,7 @@ flowchart LR
 ### Conceptual data model (summary)
 
 The FSI database is organised around a small number of core entities with clear, intentional relationships.
-This structure supports incremental operation, traceability, and separation between discovery and curation.
+This structure supports incremental operation, traceability, and separation between discovery and curation. See [schema/ERD.dbml](schema/ERD.dbml) for the full ERD.
 
 | Column                  | Type              | Description                             |
 | ----------------------- | ----------------- | --------------------------------------- |
@@ -146,9 +150,9 @@ Consumes curated initiative records from the FSI database to power external outp
 ```mermaid
 flowchart LR
   DB[(FSI database)]
-    --> M[Map visualisation]
-    --> A[API / data export]
-    --> S[Scheduled refresh jobs]
+  DB --> M[Map visualisation]
+  DB --> A[API / data export]
+  DB --> S[Scheduled refresh jobs]
 ```
 
 - Operates on curated, stable records

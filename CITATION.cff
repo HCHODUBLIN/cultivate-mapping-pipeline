@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+title: "CULTIVATE Mapping Pipeline"
+message: "If you use this work, please cite the related publication below."
+type: software
+authors:
+  - family-names: Cho
+    given-names: Hyunji
+    orcid: "https://orcid.org/0000-0003-2129-7053"
+    affiliation: "Trinity College Dublin"
+repository-code: "https://github.com/HCHODUBLIN/cultivate-mapping-pipeline"
+license: MIT
+keywords:
+  - food-sharing
+  - data-pipeline
+  - dbt
+  - snowflake
+  - urban-sustainability
+preferred-citation:
+  type: conference-paper
+  title: "LLM-based Automated Web Retrieval and Text Classification of Food Sharing Initiatives"
+  authors:
+    - family-names: Wu
+      given-names: Hao
+    - family-names: Cho
+      given-names: Hyunji
+    - family-names: Davies
+      given-names: Anna R.
+    - family-names: Jones
+      given-names: Gareth J. F.
+  year: 2024
+  collection-title: "Proceedings of the 33rd ACM International Conference on Information and Knowledge Management (CIKM '24)"
+  doi: "10.1145/3627673.3680090"
