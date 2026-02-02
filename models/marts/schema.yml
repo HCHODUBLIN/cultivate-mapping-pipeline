@@ -293,3 +293,86 @@ models:
           - dbt_utils.accepted_range:
               min_value: 0
               inclusive: true
+
+  # Power BI Export Model
+  - name: mart_fsi_powerbi_export
+    description: |
+      Flat export of gold_fsi_final for Power BI dashboard via ADF.
+      Renames columns (x_url→twitter_url, lng→lon), converts JSON arrays
+      to semicolon-delimited text, and pivots activities/sharing modes
+      into boolean flag columns (0/1).
+    columns:
+      - name: id
+        description: Unique FSI identifier
+        tests:
+          - unique
+          - not_null
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: country
+        description: Country name
+        tests:
+          - not_null
+      - name: name
+        description: FSI name
+        tests:
+          - not_null
+      - name: url
+        description: FSI website URL
+        tests:
+          - not_null
+      - name: facebook_url
+        description: Facebook URL (nullable)
+      - name: twitter_url
+        description: Twitter/X URL (renamed from x_url)
+      - name: instagram_url
+        description: Instagram URL (nullable)
+      - name: food_sharing_activities
+        description: Semicolon-delimited activity labels (Distribution, Growing, Cooking & Eating)
+      - name: how_it_is_shared
+        description: Semicolon-delimited sharing modes (Gifting, Selling, Bartering, Collecting)
+      - name: date_checked
+        description: Date when FSI was last checked (STRING in raw; parse to DATE in silver layer)
+      - name: lat
+        description: Latitude (WGS84)
+      - name: lon
+        description: Longitude (WGS84, renamed from lng)
+      - name: round
+        description: Discovery round identifier (nullable)
+      - name: growing
+        description: "Boolean flag: 1 if Growing is in food_sharing_activities"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: distribution
+        description: "Boolean flag: 1 if Distribution is in food_sharing_activities"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: cooking_eating
+        description: "Boolean flag: 1 if Cooking & Eating is in food_sharing_activities"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: gifting
+        description: "Boolean flag: 1 if Gifting is in how_it_is_shared"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: collecting
+        description: "Boolean flag: 1 if Collecting is in how_it_is_shared"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: selling
+        description: "Boolean flag: 1 if Selling is in how_it_is_shared"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: bartering
+        description: "Boolean flag: 1 if Bartering is in how_it_is_shared"
+        tests:
+          - accepted_values:
+              values: [0, 1]

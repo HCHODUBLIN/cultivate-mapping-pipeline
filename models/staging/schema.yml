@@ -124,3 +124,28 @@ models:
           - accepted_values:
               values: ['VALID', 'FP_MEDIA', 'FP_COMMERCIAL', 'FP_CROWDFUNDING', 'FP_MUSEUM', 'FP_OTHER']
               quote: true
+
+  - name: stg_fsi_powerbi_export
+    description: |
+      Silver layer: parses date_checked from raw STRING to DATE.
+      Adds date_parse_failed flag for QA on unparseable dates.
+      Adds is_recent flag to identify records added/checked today.
+      Source: mart_fsi_powerbi_export (bronze/raw)
+    columns:
+      - name: id
+        description: Unique FSI identifier
+        tests:
+          - unique
+          - not_null
+      - name: date_checked
+        description: Parsed DATE (NULL if raw value was empty or unparseable)
+      - name: date_parse_failed
+        description: TRUE if raw date_checked had a value but parsing failed
+        tests:
+          - accepted_values:
+              values: [true, false]
+      - name: is_recent
+        description: TRUE if date_checked = today (newly added or re-checked record)
+        tests:
+          - accepted_values:
+              values: [true, false]

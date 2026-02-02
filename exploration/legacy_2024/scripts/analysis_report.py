@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Analysis Report for CULTIVATE Mapping Pipeline
 Analyzes automation recall and precision metrics by language and version
@@ -13,7 +12,6 @@ from pathlib import Path
 from datetime import datetime
 from urllib.parse import urlparse
 
-# Set style
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 8)
 plt.rcParams['font.size'] = 10
@@ -36,23 +34,11 @@ def normalize_url(url):
         return ''
 
     url = str(url).strip()
-
-    # Remove http:// or https:// and optional www.
     url = re.sub(r'^https?://(www\.)?', '', url, flags=re.IGNORECASE)
-
-    # Remove query parameters and fragments
     url = re.sub(r'[?#].*$', '', url)
-
-    # Remove trailing slashes
     url = re.sub(r'/+$', '', url)
-
-    # Remove trailing quotes
     url = re.sub(r"'+$", '', url)
-
-    # Remove any whitespace
     url = re.sub(r'\s+', '', url)
-
-    # Convert to lowercase
     url = url.lower()
 
     return url
@@ -71,14 +57,8 @@ def extract_domain(url):
         return ''
 
     url = str(url).strip()
-
-    # Remove http:// or https:// and optional www.
     url = re.sub(r'^https?://(www\.)?', '', url, flags=re.IGNORECASE)
-
-    # Remove everything after first slash
     url = re.sub(r'/.*$', '', url)
-
-    # Convert to lowercase
     url = url.lower()
 
     return url
@@ -101,7 +81,7 @@ class CultivateAnalyzer:
 
         self.ground_truth = pd.read_csv(
             self.data_dir / 'ground_truth.csv',
-            encoding='utf-8-sig'  # Handle BOM
+            encoding='utf-8-sig' 
         )
         self.automation = pd.read_csv(
             self.data_dir / 'automation.csv',
@@ -116,41 +96,33 @@ class CultivateAnalyzer:
             encoding='utf-8-sig'
         )
 
-        # Clean whitespace
         for df in [self.ground_truth, self.automation, self.automation_reviewed, self.city_language]:
             df.columns = df.columns.str.strip()
             for col in df.select_dtypes(include=['str']).columns:
                 df[col] = df[col].str.strip()
 
-        # Normalize city names to lowercase for consistent joins
         self.ground_truth['city'] = self.ground_truth['city'].str.lower()
         self.automation['city'] = self.automation['city'].str.lower()
         self.city_language['city'] = self.city_language['city'].str.lower()
 
-        # Normalize URLs for matching (using same logic as dbt staging models)
         self.ground_truth['source_url_norm'] = self.ground_truth['source_url'].apply(normalize_url)
         self.automation['source_url_norm'] = self.automation['source_url'].apply(normalize_url)
 
-        # Extract domain for domain-level matching
         self.ground_truth['domain'] = self.ground_truth['source_url'].apply(extract_domain)
         self.automation['domain'] = self.automation['source_url'].apply(extract_domain)
 
-        # Extract version from run_id
         self.automation['version'] = self.automation['run_id'].str.extract(r'(v\d+)$')[0]
 
-        # Merge automation with reviews
         self.automation = self.automation.merge(
             self.automation_reviewed,
             on='automation_id',
             how='left'
         )
 
-        # Convert is_included to boolean
         self.automation['is_included_bool'] = (
             self.automation['is_included'].str.strip().str.upper() == 'TRUE'
         )
 
-        # Add language to datasets
         self.ground_truth = self.ground_truth.merge(
             self.city_language,
             on='city',
@@ -179,7 +151,6 @@ class CultivateAnalyzer:
         Returns:
             DataFrame with recall metrics
         """
-        # Mark ground truth URLs found in automation (using domain-level matching)
         gt_with_match = self.ground_truth.copy()
         gt_with_match['found'] = gt_with_match['domain'].isin(
             self.automation['domain']
@@ -281,7 +252,6 @@ class CultivateAnalyzer:
         recall = self.calculate_recall(['city', 'search_language'])
         precision = self.calculate_precision(['city', 'search_language', 'version'])
 
-        # Merge on city and language
         metrics = recall.reset_index().merge(
             precision.reset_index(),
             on=['city', 'search_language'],
@@ -323,7 +293,6 @@ class CultivateAnalyzer:
         fig, axes = plt.subplots(2, 2, figsize=(15, 10))
         fig.suptitle('CULTIVATE Analysis: Metrics by Language', fontsize=16, fontweight='bold')
 
-        # Recall by language
         ax1 = axes[0, 0]
         metrics.plot(
             x='search_language',
@@ -340,7 +309,6 @@ class CultivateAnalyzer:
         ax1.axhline(y=50, color='r', linestyle='--', alpha=0.5, label='50% threshold')
         ax1.legend()
 
-        # Precision by language
         ax2 = axes[0, 1]
         metrics.plot(
             x='search_language',

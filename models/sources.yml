@@ -122,6 +122,27 @@ sources:
           - name: lat
             description: Latitude
 
+      - name: mart_fsi_powerbi_export
+        description: |
+          Bronze/raw Power BI export table (3,052 FSIs)
+          date_checked stored as STRING; parse in silver layer (stg_fsi_powerbi_export)
+        columns:
+          - name: id
+            description: Unique FSI identifier
+            tests:
+              - unique
+              - not_null
+          - name: city
+            description: City name
+            tests:
+              - not_null
+          - name: country
+            description: Country name
+            tests:
+              - not_null
+          - name: date_checked
+            description: Raw date string (DD/MM/YYYY or empty); parsed to DATE in silver layer
+
       - name: bronze_sharecity200_raw
         description: |
           ShareCity200 pre-deduplication export (3,140 FSIs)
