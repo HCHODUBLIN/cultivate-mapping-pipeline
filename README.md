@@ -167,46 +167,11 @@ The author, **Dr Hyunji Cho**, served as **Data Solution Architect and Systems D
 - cloud-based ingestion and validation workflows; and
 - development of public-safe analytical queries and evaluation methods.
 
-| Role | Organisation |
-|------|-------------|
-| WP2 academic leadership | Trinity College Dublin |
-| Automation tool development | DCU / ADAPT Centre |
+| Role                                             | Organisation           |
+| ------------------------------------------------ | ---------------------- |
+| WP2 academic leadership                          | Trinity College Dublin |
+| Automation tool development                      | DCU / ADAPT Centre     |
 | Pipeline design, modelling, validation, analysis | TCD WP2 technical team |
-
----
-
-## Analysis pipelines
-
-This repository includes two complementary approaches for evaluating automation performance against manually curated ground truth data.
-
-### 1. Domain-level matching
-
-[`01_domain_level_matching.sql`](exploration/legacy_2024/snowflake/01_domain_level_matching.sql), [`analysis_report.py`](exploration/legacy_2024/scripts/analysis_report.py)
-
-Provides a fast, aggregated overview using domain-level URL matching:
-
-- Recall metrics (ground truth coverage)
-- Precision metrics (automation accuracy)
-- Language and version comparisons
-- F1 scores
-
-**Use when**: high-level performance metrics and summary statistics are required.
-
-### 2. Similarity-based matching
-
-[`02_similarity_matching.sql`](exploration/legacy_2024/snowflake/02_similarity_matching.sql), [`similarity_analysis.py`](exploration/legacy_2024/scripts/similarity_analysis.py)
-
-Multi-level URL matching with confidence scoring to support manual review:
-
-- Exact URL matches (100% confidence)
-- Domain + path segment matches (~75% confidence)
-- Domain-only matches (20–40% confidence)
-- String similarity percentages
-- Prioritised manual review queue
-
-**Use when**: identifying specific matches for manual validation, particularly for platforms where domain-level matching is insufficient (e.g. social media).
-
-Both pipelines rely on shared dbt staging models with consistent URL normalisation across SQL and Python implementations.
 
 ---
 

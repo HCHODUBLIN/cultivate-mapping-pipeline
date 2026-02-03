@@ -10,7 +10,7 @@ USE SCHEMA PUBLIC;
 
 CREATE OR REPLACE VIEW STG_FSI_POWERBI_EXPORT AS
 SELECT
-    id,
+    TRY_CAST(id AS INTEGER)                         AS id,
     city,
     country,
     name,
@@ -21,12 +21,12 @@ SELECT
     food_sharing_activities,
     how_it_is_shared,
 
-    -- Safe date parsing: try multiple formats, NULL on failure
+    -- Safe date parsing → TIMESTAMP for Azure SQL datetime
     COALESCE(
         TRY_TO_DATE(date_checked, 'DD/MM/YYYY'),
         TRY_TO_DATE(date_checked, 'YYYY-MM-DD'),
         TRY_TO_DATE(date_checked, 'MM/DD/YYYY')
-    )                                               AS date_checked,
+    )::TIMESTAMP_NTZ                                AS date_checked,
 
     -- QA flag: true if raw value exists but parsing failed
     CASE
@@ -51,16 +51,16 @@ SELECT
         ELSE FALSE
     END                                             AS is_recent,
 
-    lat,
-    lon,
+    lat::NUMBER(10,7)                               AS lat,
+    lon::NUMBER(10,7)                               AS lon,
     round,
-    growing,
-    distribution,
-    cooking_eating,
-    gifting,
-    collecting,
-    selling,
-    bartering
+    growing     = 1                                 AS growing,
+    distribution = 1                                AS distribution,
+    cooking_eating = 1                              AS cooking_eating,
+    gifting     = 1                                 AS gifting,
+    collecting  = 1                                 AS collecting,
+    selling     = 1                                 AS selling,
+    bartering   = 1                                 AS bartering
 FROM MART_FSI_POWERBI_EXPORT;
 
 -- Validate

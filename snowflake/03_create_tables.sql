@@ -44,7 +44,32 @@ CREATE OR REPLACE TABLE raw_cultivate_api (
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
--- 6) ShareCity200 pre-deduplication data (CSV) - Analysis
+-- 6) Power BI export (CSV, loaded via 07_powerbi_export.sql MERGE)
+CREATE TABLE IF NOT EXISTS MART_FSI_POWERBI_EXPORT (
+    id                      STRING,
+    city                    STRING,
+    country                 STRING,
+    name                    STRING,
+    url                     STRING,
+    facebook_url            STRING,
+    twitter_url             STRING,
+    instagram_url           STRING,
+    food_sharing_activities STRING,
+    how_it_is_shared        STRING,
+    date_checked            STRING,
+    lat                     FLOAT,
+    lon                     FLOAT,
+    round                   STRING,
+    growing                 INTEGER,
+    distribution            INTEGER,
+    cooking_eating          INTEGER,
+    gifting                 INTEGER,
+    collecting              INTEGER,
+    selling                 INTEGER,
+    bartering               INTEGER
+);
+
+-- 7) ShareCity200 pre-deduplication data (CSV) - Analysis
 CREATE OR REPLACE TABLE bronze_sharecity200_raw (
     country VARCHAR,
     city VARCHAR,

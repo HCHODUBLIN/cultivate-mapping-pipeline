@@ -230,6 +230,9 @@ dbt_packages/
 logs/
 dbt_modules/
 
+# Temp scripts (workarounds until WordPress DB is fixed)
+infra/scripts/_temp_*
+
 # Snowflake credentials and environment-specific files
 snowflake/02_stages.sql
 *_credentials.sql
