@@ -234,6 +234,7 @@ dbt_modules/
 infra/scripts/_temp_*
 
 # Snowflake credentials and environment-specific files
+snowflake/00_context.sql
 snowflake/02_stages.sql
 *_credentials.sql
 *.sql.secret

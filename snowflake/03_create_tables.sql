@@ -69,7 +69,6 @@ CREATE TABLE IF NOT EXISTS MART_FSI_POWERBI_EXPORT (
     bartering               INTEGER
 );
 
--- 7) ShareCity200 pre-deduplication data (CSV) - Analysis
 CREATE OR REPLACE TABLE bronze_sharecity200_raw (
     country VARCHAR,
     city VARCHAR,
