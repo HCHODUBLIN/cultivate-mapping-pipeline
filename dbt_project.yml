@@ -1,0 +1,28 @@
+name: 'cultivate'
+version: '1.0.0'
+config-version: 2
+
+profile: 'cultivate'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  cultivate:
+    staging:
+      +materialized: view
+      +schema: staging
+    analysis:
+      +materialized: view
+      +schema: analysis
+    marts:
+      +materialized: table
+      +schema: marts
