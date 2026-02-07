@@ -14,9 +14,6 @@ on:
       - 'snowflake/**'
       - 'dbt_project.yml'
 
-env:
-  DBT_PROFILES_DIR: ${{ github.workspace }}
-
 jobs:
   # Job 1: SQL Lint (항상 실행)
   sql-lint:
@@ -59,23 +56,24 @@ jobs:
           pip install dbt-snowflake==1.7.0
 
       - name: Create profiles.yml
+        env:
+          PROFILES_CONTENT: |
+            cultivate:
+              target: ci
+              outputs:
+                ci:
+                  type: snowflake
+                  account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                  user: ${{ secrets.SNOWFLAKE_USER }}
+                  password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+                  role: ${{ secrets.SNOWFLAKE_ROLE }}
+                  database: ${{ secrets.SNOWFLAKE_DATABASE }}
+                  warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+                  schema: CI_TEST_${{ github.run_id }}
+                  threads: 4
         run: |
           mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml << 'EOF'
-          cultivate:
-            target: ci
-            outputs:
-              ci:
-                type: snowflake
-                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-                user: ${{ secrets.SNOWFLAKE_USER }}
-                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
-                role: ${{ secrets.SNOWFLAKE_ROLE }}
-                database: ${{ secrets.SNOWFLAKE_DATABASE }}
-                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-                schema: CI_TEST_${{ github.run_id }}
-                threads: 4
-          EOF
+          echo "$PROFILES_CONTENT" > ~/.dbt/profiles.yml
 
       - name: dbt deps
         run: dbt deps
