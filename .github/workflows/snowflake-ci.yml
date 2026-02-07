@@ -35,13 +35,54 @@ jobs:
           sqlfluff lint models/ --dialect snowflake --exclude-rules LT05,LT12 || true
           echo "::notice::SQL lint completed (warnings only, not blocking)"
 
+  # Job 2: Snowflake secrets guard (always runs)
+  snowflake-secrets-guard:
+    name: Snowflake Secrets Guard
+    runs-on: ubuntu-latest
+    outputs:
+      has_secrets: ${{ steps.check.outputs.has_secrets }}
+    steps:
+      - name: Check required Snowflake secrets
+        id: check
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+        run: |
+          missing=()
+          [ -z "$SNOWFLAKE_ACCOUNT" ] && missing+=("SNOWFLAKE_ACCOUNT")
+          [ -z "$SNOWFLAKE_USER" ] && missing+=("SNOWFLAKE_USER")
+          [ -z "$SNOWFLAKE_PASSWORD" ] && missing+=("SNOWFLAKE_PASSWORD")
+          [ -z "$SNOWFLAKE_ROLE" ] && missing+=("SNOWFLAKE_ROLE")
+          [ -z "$SNOWFLAKE_DATABASE" ] && missing+=("SNOWFLAKE_DATABASE")
+          [ -z "$SNOWFLAKE_WAREHOUSE" ] && missing+=("SNOWFLAKE_WAREHOUSE")
+
+          if [ ${#missing[@]} -eq 0 ]; then
+            echo "has_secrets=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_secrets=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Snowflake secrets missing: ${missing[*]}. Skipping dbt Snowflake Test job."
+          fi
+
   # Job 2: dbt Build & Test (Snowflake 연결)
   dbt-snowflake:
     name: dbt Snowflake Test
     runs-on: ubuntu-latest
-    needs: sql-lint
+    needs:
+      - sql-lint
+      - snowflake-secrets-guard
     # main 브랜치 push 또는 PR label이 'run-snowflake-tests'일 때만 실행
-    if: github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'run-snowflake-tests')
+    if: (github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'run-snowflake-tests')) && needs.snowflake-secrets-guard.outputs.has_secrets == 'true'
+    env:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
 
     steps:
       - uses: actions/checkout@v4
@@ -55,25 +96,47 @@ jobs:
         run: |
           pip install dbt-snowflake==1.7.0
 
+      - name: Cache dbt artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            dbt_packages
+          key: dbt-${{ runner.os }}-${{ hashFiles('dbt_project.yml', 'packages.yml', 'packages.lock') }}
+          restore-keys: |
+            dbt-${{ runner.os }}-
+
       - name: Create profiles.yml
         env:
-          PROFILES_CONTENT: |
-            cultivate:
-              target: ci
-              outputs:
-                ci:
-                  type: snowflake
-                  account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-                  user: ${{ secrets.SNOWFLAKE_USER }}
-                  password: ${{ secrets.SNOWFLAKE_PASSWORD }}
-                  role: ${{ secrets.SNOWFLAKE_ROLE }}
-                  database: ${{ secrets.SNOWFLAKE_DATABASE }}
-                  warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-                  schema: CI_TEST_${{ github.run_id }}
-                  threads: 4
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
           mkdir -p ~/.dbt
-          echo "$PROFILES_CONTENT" > ~/.dbt/profiles.yml
+          mkdir -p target
+          raw_suffix="${{ github.event.pull_request.number || github.ref_name }}"
+          safe_suffix="$(echo "$raw_suffix" | tr '[:lower:]' '[:upper:]' | sed 's/[^A-Z0-9_]/_/g')"
+          if [ -z "$safe_suffix" ]; then
+            safe_suffix="MAIN"
+          fi
+          cat > ~/.dbt/profiles.yml <<EOF
+          cultivate:
+            target: ci
+            outputs:
+              ci:
+                type: snowflake
+                account: "$SNOWFLAKE_ACCOUNT"
+                user: "$SNOWFLAKE_USER"
+                password: "$SNOWFLAKE_PASSWORD"
+                role: "$SNOWFLAKE_ROLE"
+                database: "$SNOWFLAKE_DATABASE"
+                warehouse: "$SNOWFLAKE_WAREHOUSE"
+                schema: CI_TEST_${{ github.run_id }}_${safe_suffix}
+                threads: 4
+          EOF
 
       - name: dbt deps
         run: dbt deps
@@ -83,6 +146,18 @@ jobs:
 
       - name: dbt build (run + test)
         run: dbt build --select state:modified+ --defer --state ./target
+
+      - name: dbt docs generate
+        run: dbt docs generate
+
+      - name: Upload dbt artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: |
+            target/manifest.json
+            target/run_results.json
+            target/catalog.json
 
       - name: Cleanup CI schema
         if: always()
