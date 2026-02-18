@@ -118,12 +118,12 @@ Or use the sync script:
 
 ```sql
 -- Create external stage for ShareCity200
-CREATE STAGE IF NOT EXISTS cultivate_db.public.sharecity200_stage
+CREATE STAGE IF NOT EXISTS CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.sharecity200_stage
   URL = 'azure://cultivatedata.blob.core.windows.net/cultivatedata/bronze/sharecity200/'
   CREDENTIALS = (AZURE_SAS_TOKEN = '...');
 
 -- Create table
-CREATE TABLE IF NOT EXISTS cultivate_db.public.bronze_sharecity200_raw (
+CREATE TABLE IF NOT EXISTS CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.bronze_sharecity200_raw (
     country VARCHAR,
     city VARCHAR,
     name VARCHAR,
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS cultivate_db.public.bronze_sharecity200_raw (
 );
 
 -- Load data
-COPY INTO cultivate_db.public.bronze_sharecity200_raw
+COPY INTO CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.bronze_sharecity200_raw
 FROM @sharecity200_stage/sharecity200-export-1768225380870.csv
 FILE_FORMAT = (
     TYPE = 'CSV'

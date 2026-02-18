@@ -5,8 +5,8 @@
 -- Can run directly in Snowflake without dbt
 -- ============================================================================
 
-USE DATABASE cultivate_db;
-USE SCHEMA public;
+USE DATABASE CULTIVATE;
+USE SCHEMA HC_LOAD_DATA_FROM_CLOUD;
 
 -- Overall Summary
 SELECT

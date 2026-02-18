@@ -3,8 +3,8 @@ version: 2
 sources:
   - name: cultivate
     description: Raw tables for CULTIVATE mapping pipeline data
-    database: cultivate_db  # Update with your Snowflake database name
-    schema: public  # Update with your Snowflake schema name
+    database: CULTIVATE
+    schema: HC_LOAD_DATA_FROM_CLOUD
 
     tables:
       - name: raw_ground_truth
@@ -192,8 +192,8 @@ sources:
 
   # Analysis source tables (2025/02 - Prompt Engineering)
   - name: analysis
-    database: cultivate_db
-    schema: public
+    database: CULTIVATE
+    schema: HC_LOAD_DATA_FROM_CLOUD
     description: Analysis and filtering results from prompt engineering tests
     tables:
       - name: raw_fsi_filter_results

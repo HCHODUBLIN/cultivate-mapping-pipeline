@@ -95,25 +95,25 @@ After running dbt models, query the mart tables in Snowflake:
 ```sql
 -- Top 20 cities by FSI count
 SELECT city, country, fsi_count, fsis_per_100k, regional_cluster
-FROM cultivate_db.public.fsi_city_summary
+FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_city_summary
 ORDER BY fsi_count DESC
 LIMIT 20;
 
 -- Cluster summary
 SELECT regional_cluster, total_fsis, num_cities, fsis_per_100k
-FROM cultivate_db.public.fsi_cluster_analysis
+FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_cluster_analysis
 ORDER BY fsis_per_100k DESC;
 
 -- Activity breakdown
 SELECT metric_name, fsi_count, pct_of_total
-FROM cultivate_db.public.fsi_activity_summary
+FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_activity_summary
 WHERE metric_type = 'Activity'
 ORDER BY fsi_count DESC;
 ```
 
 ## Data Source
 
-**Snowflake Table:** `cultivate_db.public.gold_fsi_final`
+**Snowflake Table:** `CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.gold_fsi_final`
 
 This table contains the final deduplicated FSI dataset:
 - 3,052 FSIs across 105 cities
@@ -157,8 +157,8 @@ pip install dbt-snowflake
 ```
 
 **Snowflake Access:**
-- Database: `cultivate_db`
-- Schema: `public`
+- Database: `CULTIVATE`
+- Schema: `HC_LOAD_DATA_FROM_CLOUD`
 - Required tables: `gold_fsi_final`
 
 ## Next Steps

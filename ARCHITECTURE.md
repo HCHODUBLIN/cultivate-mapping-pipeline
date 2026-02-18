@@ -14,11 +14,15 @@ flowchart LR
   A[Input <br/>preparation]
     --> B[Discovery & <br/>extraction]
     --> C[LLM-based <br/>classification]
-    --> E[(FSI <br/>database)]
+    --> D[Manual <br/>verification]
+    --> E[(Validated FSI <br/>database)]
 
+  %% use of outputs
   E --> F[Delivery & <br/>maintenance]
-  E --> G{Analysis & <br/>interpretation}
-  G --> H[Method <br/>refinement]
+  E --> G[Analysis & <br/>interpretation]
+
+  %% learning loop
+  D --> H[Method <br/>refinement]
   H --> A
 ```
 
@@ -31,7 +35,7 @@ flowchart LR
   CL[(City list)]
     --> QD{Query <br/>design}
 
-  FD[(FoodSharing Dictionary<br/>31 languages)]
+  FD[(FoodSharing Dictionary<br/>25 languages)]
     --> QD
 
   QD --> QT[Query templates<br/>& parameters]

@@ -21,13 +21,13 @@ This guide walks through creating a Power BI dashboard for the 105 Cities FSI La
 3. Enter Snowflake credentials:
    ```
    Server: your_account.snowflakecomputing.com
-   Warehouse: compute_wh
+   Warehouse: FSI_WH
    ```
 
 4. **Advanced options:**
    ```sql
    -- Optional: Use custom SQL query to optimize load
-   SELECT * FROM cultivate_db.public.fsi_city_summary
+   SELECT * FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_city_summary
    ```
 
 5. Authentication:

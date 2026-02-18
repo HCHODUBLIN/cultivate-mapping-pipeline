@@ -6,8 +6,8 @@
 -- Expected rows: 3,140 FSIs
 -- ============================================================================
 
-USE DATABASE cultivate_db;
-USE SCHEMA public;
+USE DATABASE CULTIVATE;
+USE SCHEMA HC_LOAD_DATA_FROM_CLOUD;
 
 -- Create bronze table for pre-deduplication data
 CREATE TABLE IF NOT EXISTS bronze_sharecity200_raw (

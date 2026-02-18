@@ -122,7 +122,7 @@ SELECT
     fsi_count_after,
     duplicates_removed,
     dedup_rate_pct
-FROM cultivate_db.public.fsi_deduplication_impact
+FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_deduplication_impact
 WHERE city = 'TOTAL';
 ```
 
@@ -143,7 +143,7 @@ SELECT
     fsi_count_after,
     duplicates_removed,
     dedup_rate_pct
-FROM cultivate_db.public.fsi_deduplication_impact
+FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_deduplication_impact
 WHERE city != 'TOTAL'
   AND duplicates_removed > 0
 ORDER BY duplicates_removed DESC
@@ -168,7 +168,7 @@ SELECT
     country,
     fsi_count_before,
     fsi_count_after
-FROM cultivate_db.public.fsi_deduplication_impact
+FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_deduplication_impact
 WHERE city != 'TOTAL'
   AND duplicates_removed = 0
 ORDER BY fsi_count_after DESC;
@@ -187,7 +187,7 @@ SELECT
     fsi_count_before,
     duplicates_removed,
     dedup_rate_pct
-FROM cultivate_db.public.fsi_deduplication_impact
+FROM CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_deduplication_impact
 WHERE city != 'TOTAL'
 ORDER BY dedup_rate_pct DESC
 LIMIT 20;
@@ -203,7 +203,7 @@ To use this data in Power BI dashboard:
 
 1. **Add to Power BI data source:**
    - Connect to Snowflake
-   - Select table: `cultivate_db.public.fsi_deduplication_impact`
+   - Select table: `CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.fsi_deduplication_impact`
 
 2. **Create visuals:**
    - **KPI Card:** Total duplicates removed (88)

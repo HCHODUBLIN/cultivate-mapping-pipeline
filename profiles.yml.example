@@ -7,7 +7,7 @@ cultivate:
       user: <YOUR_USERNAME>
       password: <YOUR_PASSWORD>
       role: ACCOUNTADMIN
-      database: SNOWFLAKE_LEARNING_DB
-      warehouse: COMPUTE_WH
-      schema: <YOUR_USERNAME>_LOAD_DATA_FROM_CLOUD
+      database: CULTIVATE
+      warehouse: FSI_WH
+      schema: HC_LOAD_DATA_FROM_CLOUD
       threads: 4

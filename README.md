@@ -5,6 +5,25 @@ Architecture overview → [ARCHITECTURE.md](ARCHITECTURE.md) | Data model → [s
 
 ---
 
+## Architecture Overview
+
+```mermaid
+flowchart LR
+  A[Input preparation]
+    --> B[Discovery & extraction]
+    --> C[LLM-based classification]
+    --> E[(FSI database)]
+
+  E --> F[Delivery & maintenance]
+  E --> G{Analysis & interpretation}
+  G --> H[Method refinement]
+  H --> A
+```
+
+Full architecture: [ARCHITECTURE.md](ARCHITECTURE.md) | Design rationale: [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md)
+
+---
+
 ## Purpose of this repository
 
 This repository documents the production-grade data automation pipeline that underpins the **Food Sharing Map**, hosted on the **Sharing Solutions** platform  
