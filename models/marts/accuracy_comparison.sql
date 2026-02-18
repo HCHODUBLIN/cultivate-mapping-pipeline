@@ -12,10 +12,9 @@ with manual_verification as (
         accuracy_pct as manual_accuracy_pct
     from {{ ref('manual_verification_summary') }}
     where round_version != 'All Rounds'
+      and city = 'All Cities'
 ),
 
--- Placeholder for automation accuracy
--- This would join with raw_automation_reviewed to calculate automation accuracy
 automation_baseline as (
     select
         'All Cities' as city,
@@ -47,21 +46,20 @@ automation_baseline as (
         5 as round_number,
         null as total_automation_results,
         null as automation_valid,
-        74.0 as automation_accuracy_pct  -- Agent-based approach
+        74.0 as automation_accuracy_pct 
 ),
 
 combined as (
     select
-        coalesce(m.city, a.city) as city,
-        coalesce(m.round_version, a.round_version) as round_version,
-        coalesce(m.round_number, a.round_number) as round_number,
+        m.city,
+        m.round_version,
+        m.round_number,
         m.total_urls_checked as manual_urls_checked,
         m.valid_fsis as manual_valid_fsis,
         m.manual_accuracy_pct,
         a.total_automation_results,
         a.automation_valid,
         a.automation_accuracy_pct,
-        -- Calculate improvement
         round(m.manual_accuracy_pct - a.automation_accuracy_pct, 2) as accuracy_improvement,
         case
             when a.automation_accuracy_pct is not null
@@ -69,9 +67,8 @@ combined as (
             else null
         end as pct_improvement
     from manual_verification m
-    full outer join automation_baseline a
-        on m.city = a.city
-        and m.round_version = a.round_version
+    left join automation_baseline a
+        on m.round_version = a.round_version
 )
 
 select * from combined

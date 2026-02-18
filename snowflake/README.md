@@ -13,8 +13,7 @@ This folder contains SQL scripts for Snowflake data warehouse operations.
 | 4 | `04_copy_into.sql` | Data loading (COPY INTO) |
 | 5 | `05_dedup.sql` | Duplicate check views |
 | 6 | `06_validation.sql` | Data validation queries |
-| 7 | `07_powerbi_export.sql` | Power BI export MERGE |
-| 8 | `08_silver_powerbi_export.sql` | Silver view (type casting) |
+| 7 | `07_publish_for_bi.sql` | BI presentation views for ThoughtSpot/Streamlit |
 
 ## Template setup
 
