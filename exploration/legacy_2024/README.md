@@ -28,7 +28,7 @@ Both approaches use the same dbt staging models to ensure consistent URL normali
 
 - **Snowflake**: `snowflake/01_analysis.sql`
 - **Python**: `scripts/analysis_report.py`
-- **dbt models**: `models/staging/stg_*.sql`
+- **dbt models**: `dbt/models/staging/stg_*.sql`
 
 ### Snowflake Usage
 
@@ -95,7 +95,7 @@ python3 scripts/analysis_report.py
 
 - **Snowflake**: `snowflake/02_similarity_matching.sql`
 - **Python**: `scripts/similarity_analysis.py`
-- **dbt models**: `models/staging/stg_*_enhanced.sql`
+- **dbt models**: `dbt/models/staging/stg_*_enhanced.sql`
 
 ### Snowflake Usage
 
@@ -229,7 +229,7 @@ Both methods use consistent URL normalisation:
 ### dbt Model Structure
 
 ```
-models/
+dbt/models/
 ├── staging/
 │   ├── stg_ground_truth.sql           # Basic normalisation
 │   ├── stg_automation.sql              # Basic normalisation

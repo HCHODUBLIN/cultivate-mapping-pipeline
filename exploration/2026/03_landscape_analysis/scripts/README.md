@@ -28,7 +28,7 @@
 
 ### dbt Mart Models
 
-Located in `/models/marts/`:
+Located in `/dbt/models/marts/`:
 
 1. **`fsi_city_summary.sql`**
    - City-level FSI counts

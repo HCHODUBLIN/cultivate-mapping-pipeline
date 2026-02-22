@@ -181,7 +181,7 @@ FILE_FORMAT = (
 ### Step 4: Create Comparison Model (Optional)
 
 ```sql
--- models/analysis/fsi_deduplication_impact.sql
+-- dbt/models/analysis/fsi_deduplication_impact.sql
 -- Compare pre vs post deduplication
 
 with pre_dedup as (

@@ -5,15 +5,17 @@ on:
   push:
     branches: [main]
     paths:
-      - 'models/**'
+      - 'dbt/models/**'
       - 'snowflake/**'
-      - 'dbt_project.yml'
+      - 'dbt/dbt_project.yml'
+      - 'dbt/packages.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'models/**'
+      - 'dbt/models/**'
       - 'snowflake/**'
-      - 'dbt_project.yml'
+      - 'dbt/dbt_project.yml'
+      - 'dbt/packages.yml'
 
 jobs:
   # Job 1: SQL Lint (항상 실행)
@@ -33,7 +35,7 @@ jobs:
 
       - name: Lint SQL files
         run: |
-          sqlfluff lint models/ --dialect snowflake --exclude-rules LT05,LT12 || true
+          sqlfluff lint dbt/models/ --dialect snowflake --exclude-rules LT05,LT12 || true
           echo "::notice::SQL lint completed (warnings only, not blocking)"
 
   # Job 2: Snowflake secrets guard (always runs)
@@ -84,6 +86,9 @@ jobs:
       SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
       SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
       SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+    defaults:
+      run:
+        working-directory: dbt
 
     steps:
       - uses: actions/checkout@v4
@@ -101,9 +106,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            target
-            dbt_packages
-          key: dbt-${{ runner.os }}-${{ hashFiles('dbt_project.yml', 'packages.yml', 'packages.lock') }}
+            dbt/target
+            dbt/dbt_packages
+          key: dbt-${{ runner.os }}-${{ hashFiles('dbt/dbt_project.yml', 'dbt/packages.yml', 'dbt/package-lock.yml') }}
           restore-keys: |
             dbt-${{ runner.os }}-
 
@@ -156,9 +161,9 @@ jobs:
         with:
           name: dbt-artifacts
           path: |
-            target/manifest.json
-            target/run_results.json
-            target/catalog.json
+            dbt/target/manifest.json
+            dbt/target/run_results.json
+            dbt/target/catalog.json
 
       - name: Cleanup CI schema
         if: always()

@@ -450,7 +450,7 @@ exploration/2026/03/FSI_Landscape_105Cities.pbix
 **Supporting Documentation:**
 - This guide: `POWERBI_SETUP.md`
 - Data dictionary: `scripts/README.md`
-- dbt models: `models/marts/fsi_*.sql`
+- dbt models: `dbt/models/marts/fsi_*.sql`
 
 ---
 

@@ -96,7 +96,7 @@ dbt show --select fsi_deduplication_impact
 
 ### Model: `fsi_deduplication_impact`
 
-**Location:** `models/marts/fsi_deduplication_impact.sql`
+**Location:** `dbt/models/marts/fsi_deduplication_impact.sql`
 
 **Columns:**
 - `city` - City name
@@ -257,7 +257,7 @@ After running the comparison:
 - **Solution:** Check CSV upload to Azure, verify COPY INTO completed successfully
 
 **Issue:** dbt model fails with source not found
-- **Solution:** Verify `models/sources.yml` includes `bronze_sharecity200_raw` definition
+- **Solution:** Verify `dbt/models/sources.yml` includes `bronze_sharecity200_raw` definition
 
 **Issue:** Gold data shows different count
 - **Solution:** Verify you're using the correct gold_fsi_final table (post-deduplication)
@@ -270,8 +270,8 @@ After running the comparison:
 - [snowflake/08_bronze_sharecity200.sql](../../../snowflake/08_bronze_sharecity200.sql) - Table creation and data load
 
 **dbt:**
-- [models/sources.yml](../../../models/sources.yml) - Added bronze_sharecity200_raw source
-- [models/marts/fsi_deduplication_impact.sql](../../../models/marts/fsi_deduplication_impact.sql) - Comparison model
+- [dbt/models/sources.yml](../../../dbt/models/sources.yml) - Added bronze_sharecity200_raw source
+- [dbt/models/marts/fsi_deduplication_impact.sql](../../../dbt/models/marts/fsi_deduplication_impact.sql) - Comparison model
 
 **Documentation:**
 - This file: `DEDUPLICATION_COMPARISON.md`
