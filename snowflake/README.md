@@ -2,6 +2,9 @@
 
 This folder contains SQL scripts for Snowflake data warehouse operations.
 
+Internal logic reference:
+- `docs/internal_snowflake_ingestion_runbook.md`
+
 ## Execution order
 
 | Order | File | Description |
@@ -13,7 +16,6 @@ This folder contains SQL scripts for Snowflake data warehouse operations.
 | 4 | `04_copy_into.sql` | Data loading (COPY INTO) |
 | 5 | `05_dedup.sql` | Duplicate check views |
 | 6 | `06_validation.sql` | Data validation queries |
-| 7 | `07_publish_for_bi.sql` | BI presentation views for ThoughtSpot/Streamlit |
 
 ## Template setup
 
@@ -39,6 +41,9 @@ cp 02_stages.sql.template 02_stages.sql
 
 > **Note:** `.sql` files are listed in `.gitignore` to prevent credentials from being committed to the repository.
 
-## CI/CD
+## Notes
 
-For GitHub Actions Snowflake CI, credentials are injected via GitHub Secrets. See `.github/workflows/snowflake-ci.yml`.
+- `04_copy_into.sql` uses explicit Azure folder paths (`data/exploration_data/...`, `data/gold/prod/...`).
+- Tracker ingestion is included in step 4 as `COPY INTO raw_sharecity200_tracker_run01`.
+- `ShareCity200Tracker.xlsx` cannot be loaded directly with `COPY INTO`; convert it to `data/bronze/run-01/ShareCity200Tracker.csv` first.
+- `04_copy_into.sql` also snapshots Azure Bronze file inventory into `bronze_blob_inventory_raw`.

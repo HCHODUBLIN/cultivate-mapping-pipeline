@@ -18,7 +18,7 @@ post_dedup as (
         country,
         count(*) as fsi_count_after,
         count(distinct url) as unique_urls_after
-    from {{ source('cultivate', 'gold_fsi_200226') }}
+    from {{ ref('gold_fsi_final_rebuilt') }}
     group by city, country
 ),
 

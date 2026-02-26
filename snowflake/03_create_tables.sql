@@ -31,25 +31,35 @@ CREATE TABLE IF NOT EXISTS raw_ground_truth (
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS raw_cultivate_api (
-  raw_json VARIANT,
-  file_name STRING,
+CREATE TABLE IF NOT EXISTS bronze_blob_inventory_raw (
+  file_path STRING,
+  size_bytes NUMBER,
+  md5 STRING,
+  last_modified STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS raw_manual_verification (
+CREATE TABLE IF NOT EXISTS raw_sharecity200_tracker_run01 (
+  region STRING,
+  country STRING,
   city STRING,
-  url STRING,
-  name STRING,
-  is_valid STRING,
-  fp_category STRING,
+  language STRING,
+  sharecity_tier STRING,
+  hub_or_spoke STRING,
+  priority STRING,
+  dcu_fsi_search_plan_week_commencing STRING,
+  tcd_manual_check_plan_week_commencing STRING,
+  data_entry_size_before_manual_checking STRING,
+  manual_review_checker_assigned STRING,
+  fsis_searched STRING,
+  data_reviewed STRING,
+  data_uploaded STRING,
+  automation_tool_version STRING,
   comments STRING,
-  activities STRING,
-  how_shared STRING,
-  round_version STRING,
-  verified_date STRING,
-  lat FLOAT,
-  lon FLOAT,
+  valid_fsi STRING,
+  accuracy_rate STRING,
+  correct_name STRING,
+  name_accuracy_rate STRING,
   file_name STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );

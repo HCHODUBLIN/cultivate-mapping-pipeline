@@ -4,9 +4,8 @@
 -- Credentials (e.g. SAS token) must be configured locally before execution.
 
 CREATE OR REPLACE STAGE stg_azure_raw
-  URL=''
-  CREDENTIALS=(AZURE_SAS_TOKEN='')
-  FILE_FORMAT = ff_json_strip_array;
+  URL='azure://<storage-account>.blob.core.windows.net/cultivate/'
+  CREDENTIALS=(AZURE_SAS_TOKEN='<sas-token>');
 
 -- Quick visibility check
 LIST @stg_azure_raw;

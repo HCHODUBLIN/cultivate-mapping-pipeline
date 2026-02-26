@@ -1,6 +1,31 @@
 version: 2
 
 models:
+  - name: gold_fsi_final_rebuilt
+    description: |
+      Rebuilt Gold table from silver snapshot using deterministic URL-level deduplication.
+      This restores Bronze -> Silver -> Gold transformation inside dbt.
+    columns:
+      - name: id
+        description: Stable deduplicated FSI identifier (MD5 of dedup key)
+        tests:
+          - unique
+          - not_null
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: country
+        description: Country name
+        tests:
+          - not_null
+      - name: name
+        description: FSI name
+        tests:
+          - not_null
+      - name: url
+        description: Canonical website URL
+
   # FSI Landscape Analysis Models
   - name: fsi_city_summary
     description: |

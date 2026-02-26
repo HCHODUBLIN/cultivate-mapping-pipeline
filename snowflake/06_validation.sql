@@ -7,7 +7,9 @@ SELECT 'raw_city_language', COUNT(*) FROM raw_city_language
 UNION ALL
 SELECT 'raw_ground_truth', COUNT(*) FROM raw_ground_truth
 UNION ALL
-SELECT 'raw_cultivate_api', COUNT(*) FROM raw_cultivate_api
+SELECT 'raw_sharecity200_tracker_run01', COUNT(*) FROM raw_sharecity200_tracker_run01
+UNION ALL
+SELECT 'bronze_blob_inventory_raw', COUNT(*) FROM bronze_blob_inventory_raw
 UNION ALL
 SELECT 'silver_fsi_201225', COUNT(*) FROM SILVER_FSI_201225
 UNION ALL

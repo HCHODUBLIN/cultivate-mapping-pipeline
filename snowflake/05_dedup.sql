@@ -7,7 +7,7 @@ FROM raw_automation
 GROUP BY 1,2,3,4
 HAVING COUNT(*) > 1;
 
-CREATE OR REPLACE VIEW v_dupes_mart_fsi_powerbi AS
+CREATE OR REPLACE VIEW v_dupes_silver_fsi_201225 AS
 SELECT id, COUNT(*) AS n
 FROM SILVER_FSI_201225
 GROUP BY 1

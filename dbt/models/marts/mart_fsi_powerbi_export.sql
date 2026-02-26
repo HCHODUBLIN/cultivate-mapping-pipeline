@@ -1,18 +1,15 @@
 -- models/marts/mart_fsi_powerbi_export.sql
--- Transforms gold_fsi_200226 into flat schema expected by Power BI dashboard
--- Renames columns, converts JSON arrays to semicolon-delimited text,
+-- Transforms rebuilt gold dataset into flat schema expected by Power BI dashboard
+-- Converts JSON arrays to semicolon-delimited text,
 -- and pivots activities/sharing modes into boolean flag columns
 
 with fsi_data as (
-    select
-        *,
-        md5(coalesce(url, '') || '|' || coalesce(name, '') || '|' || coalesce(city, '') || '|' || coalesce(country, '')) as fsi_id
-    from {{ source('cultivate', 'gold_fsi_200226') }}
+    select * from {{ ref('gold_fsi_final_rebuilt') }}
 ),
 
 transformed as (
     select
-        fsi_id                                     as id,
+        id,
         city,
         country,
         name,

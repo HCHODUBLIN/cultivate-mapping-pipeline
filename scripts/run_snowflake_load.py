@@ -123,7 +123,8 @@ def main() -> int:
                 "raw_automation",
                 "raw_automation_reviewed",
                 "raw_city_language",
-                "raw_cultivate_api",
+                "raw_sharecity200_tracker_run01",
+                "bronze_blob_inventory_raw",
                 "silver_fsi_201225",
                 "gold_fsi_200226",
             ]

@@ -1,98 +1,114 @@
 -- 04_copy_into.sql
--- Load raw tables from Azure stage
+-- Load core CULTIVATE datasets from Azure stage with explicit folder paths.
 -- Stage root is expected to be:
 -- azure://<account>.blob.core.windows.net/cultivate/
 
--- (A) raw_automation (automation.csv)
+-- (A) raw_automation (legacy 2024)
 COPY INTO raw_automation (automation_id, city, run_id, source_url, file_name)
 FROM (
   SELECT $1, $2, $3, $4, METADATA$FILENAME
   FROM @stg_azure_raw
 )
-FILES = ('automation.csv')
+FILES = ('data/exploration_data/legacy_2024_data/automation.csv')
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
+FORCE = TRUE
 ;
 
--- (B) raw_automation_reviewed (automation_reviewed.csv)
+-- (B) raw_automation_reviewed (legacy 2024)
 COPY INTO raw_automation_reviewed (automation_id, is_included, file_name)
 FROM (
   SELECT $1, $2, METADATA$FILENAME
   FROM @stg_azure_raw
 )
-FILES = ('automation_reviewed.csv')
+FILES = ('data/exploration_data/legacy_2024_data/automation_reviewed.csv')
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
+FORCE = TRUE
 ;
 
--- (C) raw_city_language (city_language.csv)
+-- (C) raw_city_language (legacy 2024)
 COPY INTO raw_city_language (city, search_language, file_name)
 FROM (
   SELECT $1, $2, METADATA$FILENAME
   FROM @stg_azure_raw
 )
-FILES = ('city_language.csv')
+FILES = ('data/exploration_data/legacy_2024_data/city_language.csv')
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
+FORCE = TRUE
 ;
 
--- (D) raw_ground_truth (ground_truth.csv)
+-- (D) raw_ground_truth (legacy 2024)
 COPY INTO raw_ground_truth (ground_truth_id, city, source_url, file_name)
 FROM (
   SELECT $1, $2, $3, METADATA$FILENAME
   FROM @stg_azure_raw
 )
-FILES = ('ground_truth.csv')
+FILES = ('data/exploration_data/legacy_2024_data/ground_truth.csv')
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
+FORCE = TRUE
 ;
 
--- (E) raw_cultivate_api (optional)
--- Enable when file exists in stage root:
---   CopyCultivateAPItoBlob or cultivate_api_YYYYMMDD.json
-/*
-COPY INTO raw_cultivate_api (raw_json, file_name)
-FROM (
-  SELECT $1, METADATA$FILENAME
-  FROM @stg_azure_raw
-)
-FILES = ('CopyCultivateAPItoBlob')
-FILE_FORMAT = (FORMAT_NAME = ff_json_strip_array)
-;
-*/
-
--- (F) gold_fsi_200226 (optional)
--- Enable when gold_fsi_200226.csv exists in stage root.
-/*
-COPY INTO gold_fsi_200226 (
-  country, city, name, url, instagram_url, twitter_url,
-  facebook_url, food_sharing_activities, how_it_is_shared, lon, lat, comments
-)
-FROM @stg_azure_raw
-FILES = ('gold_fsi_200226.csv')
-FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
-;
-*/
-
--- (G) silver_fsi_201225 (optional)
--- Enable when silver_fsi_201225.csv exists in stage root.
-/*
-COPY INTO silver_fsi_201225
-FROM @stg_azure_raw
-FILES = ('silver_fsi_201225.csv')
-FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
-;
-*/
-
--- (H) gold_fsi_200226 (optional)
--- Uses the latest uploaded ShareCity200 export as of 2026-02-17.
--- Source file has 12 columns; map explicitly to avoid column-count mismatch.
+-- (E) gold snapshot load (current production export 2026-02-17)
 COPY INTO gold_fsi_200226 (
   country, city, name, url, instagram_url, twitter_url,
   facebook_url, food_sharing_activities, how_it_is_shared, lon, lat, comments
 )
 FROM (
   SELECT
-    $1, $2, $3, $4, $5, $6,
-    $7, $8, $9, $10, $11, $12
+    $8, $9, $1, $2, $5, $4,
+    $3, $6, $7, $10, $11, $12
   FROM @stg_azure_raw
 )
-FILES = ('sharecity200-export-1771342197988.csv')
+FILES = ('data/gold/prod/2026-02-17/sharecity200-export-1771342197988.csv')
+FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
+FORCE = TRUE
+;
+
+-- (F) silver snapshot load (pre-dedup export, optional)
+-- Uncomment if you want to rebuild silver source from 2025-12-05 export.
+/*
+COPY INTO silver_fsi_201225
+FROM @stg_azure_raw
+FILES = ('data/gold/prod/2025-12-05/sharecity200-export-1764933656343.csv')
+FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
+FORCE = TRUE
+;
+*/
+
+-- (G) run-01 tracker load (CSV required)
+-- Snowflake COPY INTO cannot ingest .xlsx directly.
+-- Convert ShareCity200Tracker.xlsx -> ShareCity200Tracker.csv and upload to:
+-- data/bronze/run-01/ShareCity200Tracker.csv
+COPY INTO raw_sharecity200_tracker_run01 (
+  region, country, city, language, sharecity_tier, hub_or_spoke, priority,
+  dcu_fsi_search_plan_week_commencing, tcd_manual_check_plan_week_commencing,
+  data_entry_size_before_manual_checking, manual_review_checker_assigned,
+  fsis_searched, data_reviewed, data_uploaded, automation_tool_version,
+  comments, valid_fsi, accuracy_rate, correct_name, name_accuracy_rate, file_name
+)
+FROM (
+  SELECT
+    $1, $2, $3, $4, $5, $6, $7,
+    $8, $9, $10, $11,
+    $12, $13, $14, $15,
+    $16, $17, $18, $19, $20, METADATA$FILENAME
+  FROM @stg_azure_raw
+)
+PATTERN = '.*data/bronze/run-01/ShareCity200Tracker\\.csv'
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
+FORCE = TRUE
+;
+
+-- (H) bronze blob inventory snapshot (for dbt stg_bronze_blob_inventory source)
+TRUNCATE TABLE bronze_blob_inventory_raw;
+
+LIST @stg_azure_raw PATTERN = '.*data/bronze/.*';
+SET BRONZE_LIST_QID = (SELECT LAST_QUERY_ID());
+
+INSERT INTO bronze_blob_inventory_raw (file_path, size_bytes, md5, last_modified)
+SELECT
+  $1::STRING AS file_path,
+  $2::NUMBER AS size_bytes,
+  $3::STRING AS md5,
+  $4::STRING AS last_modified
+FROM TABLE(RESULT_SCAN($BRONZE_LIST_QID))
 ;

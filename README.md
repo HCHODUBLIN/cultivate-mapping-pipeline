@@ -33,6 +33,13 @@ flowchart LR
 | Gold | `dbt/models/marts/` | Human-reviewed, decision-ready | Yes |
 | Evaluation | `evaluation/` | F1, precision/recall tracking | N/A (monitoring) |
 
+### Rebuilt Medallion Lineage (current)
+
+- Bronze source snapshot: `CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.SILVER_FSI_201225`
+- Silver normalization: `dbt/models/staging/stg_fsi_powerbi_export.sql`
+- Gold reconstruction: `dbt/models/marts/gold_fsi_final_rebuilt.sql` (deterministic dedup)
+- Downstream marts: models in `dbt/models/marts/` reading from `ref('gold_fsi_final_rebuilt')`
+
 ## Quick Start
 
 ```bash
@@ -44,6 +51,9 @@ python scripts/run_ingestion.py
 
 # 3. Load Snowflake raw/gold tables (requires configured Snowflake + stage)
 python scripts/run_snowflake_load.py
+
+# 3a. (Optional) Load run-01 tracker XLSX into raw_sharecity200_tracker_run01
+python scripts/load_sharecity200_tracker_run01.py --xlsx /path/to/ShareCity200Tracker.xlsx
 
 # 4. Run dbt transformations
 bash scripts/run_dbt.sh

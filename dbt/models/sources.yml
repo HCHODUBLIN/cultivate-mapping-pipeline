@@ -79,6 +79,70 @@ sources:
           - name: loaded_at
             description: Timestamp when record was loaded
 
+      - name: bronze_blob_inventory_raw
+        description: Raw LIST output snapshot for Azure Bronze blob paths.
+        columns:
+          - name: file_path
+            description: Full blob path from stage LIST output
+            tests:
+              - not_null
+          - name: size_bytes
+            description: Blob size in bytes
+          - name: md5
+            description: Blob MD5 hash
+          - name: last_modified
+            description: Blob last modified timestamp
+
+      - name: raw_sharecity200_tracker_run01
+        description: |
+          Run-01 ShareCity tracker content from ShareCity200Tracker.xlsx.
+          One row per city with planning and QA metadata.
+        columns:
+          - name: region
+            description: World region
+          - name: country
+            description: Country name
+          - name: city
+            description: City name
+          - name: language
+            description: Primary language
+          - name: sharecity_tier
+            description: ShareCity scope (e.g., SC100/SC200)
+          - name: hub_or_spoke
+            description: Hub/spoke designation
+          - name: priority
+            description: Priority level
+          - name: dcu_fsi_search_plan_week_commencing
+            description: DCU search plan week commencing date
+          - name: tcd_manual_check_plan_week_commencing
+            description: TCD manual check week commencing date
+          - name: data_entry_size_before_manual_checking
+            description: Entry count before manual checking
+          - name: manual_review_checker_assigned
+            description: Assigned reviewer
+          - name: fsis_searched
+            description: Search completion status
+          - name: data_reviewed
+            description: Review completion status
+          - name: data_uploaded
+            description: Upload completion status
+          - name: automation_tool_version
+            description: Tool version used
+          - name: comments
+            description: Free-text comments
+          - name: valid_fsi
+            description: Count of valid FSIs
+          - name: accuracy_rate
+            description: Accuracy percentage text
+          - name: correct_name
+            description: Count of correctly named rows
+          - name: name_accuracy_rate
+            description: Name accuracy percentage text
+          - name: file_name
+            description: Source filename used for ingestion
+          - name: loaded_at
+            description: Row ingestion timestamp
+
       - name: gold_fsi_200226
         description: Final deduplicated FSI dataset (Gold layer snapshot, 2026-02-20)
         tests:
