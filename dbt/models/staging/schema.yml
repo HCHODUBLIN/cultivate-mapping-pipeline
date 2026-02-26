@@ -130,7 +130,7 @@ models:
       Silver layer: parses date_checked from raw STRING to DATE.
       Adds date_parse_failed flag for QA on unparseable dates.
       Adds is_recent flag to identify records added/checked today.
-      Source: mart_fsi_powerbi_export (bronze/raw)
+      Source: silver_fsi_201225 (snapshot/raw)
     columns:
       - name: id
         description: Unique FSI identifier

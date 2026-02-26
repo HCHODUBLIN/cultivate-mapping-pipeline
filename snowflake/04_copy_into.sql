@@ -57,36 +57,42 @@ FILE_FORMAT = (FORMAT_NAME = ff_json_strip_array)
 ;
 */
 
--- (F) gold_fsi_final (optional)
--- Enable when gold_fsi_final.csv exists in stage root.
+-- (F) gold_fsi_200226 (optional)
+-- Enable when gold_fsi_200226.csv exists in stage root.
 /*
-COPY INTO gold_fsi_final (
-  id, name, url, facebook_url, x_url, instagram_url,
-  food_sharing_activities, how_it_is_shared,
-  country, city, lng, lat
+COPY INTO gold_fsi_200226 (
+  country, city, name, url, instagram_url, twitter_url,
+  facebook_url, food_sharing_activities, how_it_is_shared, lon, lat, comments
 )
 FROM @stg_azure_raw
-FILES = ('gold_fsi_final.csv')
+FILES = ('gold_fsi_200226.csv')
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 ;
 */
 
--- (G) mart_fsi_powerbi_export (optional)
--- Enable when mart_fsi_powerbi_export.csv exists in stage root.
+-- (G) silver_fsi_201225 (optional)
+-- Enable when silver_fsi_201225.csv exists in stage root.
 /*
-COPY INTO mart_fsi_powerbi_export
+COPY INTO silver_fsi_201225
 FROM @stg_azure_raw
-FILES = ('mart_fsi_powerbi_export.csv')
+FILES = ('silver_fsi_201225.csv')
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 ;
 */
 
--- (H) bronze_sharecity200_raw (optional)
--- Use FILES with the exact filename uploaded to stage.
-/*
-COPY INTO bronze_sharecity200_raw
-FROM @stg_azure_raw
-FILES = ('<sharecity200-export-file>.csv')
+-- (H) gold_fsi_200226 (optional)
+-- Uses the latest uploaded ShareCity200 export as of 2026-02-17.
+-- Source file has 12 columns; map explicitly to avoid column-count mismatch.
+COPY INTO gold_fsi_200226 (
+  country, city, name, url, instagram_url, twitter_url,
+  facebook_url, food_sharing_activities, how_it_is_shared, lon, lat, comments
+)
+FROM (
+  SELECT
+    $1, $2, $3, $4, $5, $6,
+    $7, $8, $9, $10, $11, $12
+  FROM @stg_azure_raw
+)
+FILES = ('sharecity200-export-1771342197988.csv')
 FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 ;
-*/

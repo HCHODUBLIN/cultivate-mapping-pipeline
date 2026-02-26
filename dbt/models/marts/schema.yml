@@ -297,7 +297,7 @@ models:
   # Power BI Export Model
   - name: mart_fsi_powerbi_export
     description: |
-      Flat export of gold_fsi_final for Power BI dashboard via ADF.
+      Flat export of gold_fsi_200226 for Power BI dashboard via ADF.
       Renames columns (x_url→twitter_url, lng→lon), converts JSON arrays
       to semicolon-delimited text, and pivots activities/sharing modes
       into boolean flag columns (0/1).

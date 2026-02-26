@@ -87,7 +87,7 @@ Table raw_manual_verification {
   Note: 'Manual verification results: 105 cities, 5 rounds'
 }
 
-Table bronze_sharecity200_raw {
+Table gold_fsi_final_202602 {
   country varchar [not null]
   city varchar [not null]
   name varchar [not null]

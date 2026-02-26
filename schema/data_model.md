@@ -202,7 +202,7 @@ Bronze (Raw Ingestion) → Silver (Staging & Normalization) → Gold (Business M
 **Bronze Layer:**
 - Raw data ingestion from Azure Blob Storage
 - Minimal transformation, preserving source structure
-- Tables: `raw_automation`, `raw_automation_reviewed`, `raw_ground_truth`, `raw_city_language`, `raw_manual_verification`, `bronze_sharecity200_raw`
+- Tables: `raw_automation`, `raw_automation_reviewed`, `raw_ground_truth`, `raw_city_language`, `raw_manual_verification`, `gold_fsi_final_202602`
 
 **Silver Layer:**
 - Data cleaning and normalization

@@ -9,11 +9,11 @@ SELECT 'raw_ground_truth', COUNT(*) FROM raw_ground_truth
 UNION ALL
 SELECT 'raw_cultivate_api', COUNT(*) FROM raw_cultivate_api
 UNION ALL
-SELECT 'mart_fsi_powerbi_export', COUNT(*) FROM MART_FSI_POWERBI_EXPORT
+SELECT 'silver_fsi_201225', COUNT(*) FROM SILVER_FSI_201225
 UNION ALL
-SELECT 'bronze_sharecity200_raw', COUNT(*) FROM bronze_sharecity200_raw;
+SELECT 'gold_fsi_200226', COUNT(*) FROM gold_fsi_200226;
 
 -- Spot-check
 SELECT * FROM raw_automation LIMIT 20;
 SELECT * FROM raw_automation_reviewed LIMIT 20;
-SELECT * FROM MART_FSI_POWERBI_EXPORT LIMIT 20;
+SELECT * FROM SILVER_FSI_201225 LIMIT 20;

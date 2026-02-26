@@ -2,13 +2,16 @@
 -- Analysis of food sharing activities and sharing modes
 
 with fsi_data as (
-    select * from {{ source('cultivate', 'gold_fsi_final') }}
+    select
+        *,
+        md5(coalesce(url, '') || '|' || coalesce(name, '') || '|' || coalesce(city, '') || '|' || coalesce(country, '')) as fsi_id
+    from {{ source('cultivate', 'gold_fsi_200226') }}
 ),
 
 -- Parse activities array (assuming VARIANT/JSON column)
 activities_exploded as (
     select
-        id,
+        fsi_id as id,
         name,
         city,
         country,
@@ -20,7 +23,7 @@ activities_exploded as (
 -- Parse sharing modes array
 sharing_modes_exploded as (
     select
-        id,
+        fsi_id as id,
         name,
         city,
         country,

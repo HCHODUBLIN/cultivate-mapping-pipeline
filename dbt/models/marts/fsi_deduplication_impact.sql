@@ -7,8 +7,8 @@ with pre_dedup as (
         city,
         country,
         count(*) as fsi_count_before,
-        count(distinct url) as unique_urls_before
-    from {{ source('cultivate', 'bronze_sharecity200_raw') }}
+        count(distinct coalesce(id, url)) as unique_urls_before
+    from {{ source('cultivate', 'silver_fsi_201225') }}
     group by city, country
 ),
 
@@ -18,7 +18,7 @@ post_dedup as (
         country,
         count(*) as fsi_count_after,
         count(distinct url) as unique_urls_after
-    from {{ source('cultivate', 'gold_fsi_final') }}
+    from {{ source('cultivate', 'gold_fsi_200226') }}
     group by city, country
 ),
 

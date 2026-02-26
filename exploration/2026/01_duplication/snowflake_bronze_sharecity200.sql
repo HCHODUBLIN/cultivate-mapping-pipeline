@@ -9,8 +9,8 @@
 USE DATABASE CULTIVATE;
 USE SCHEMA HC_LOAD_DATA_FROM_CLOUD;
 
--- Create bronze table for pre-deduplication data
-CREATE TABLE IF NOT EXISTS bronze_sharecity200_raw (
+-- Create comparison input table
+CREATE TABLE IF NOT EXISTS gold_fsi_200226 (
     country VARCHAR,
     city VARCHAR,
     name VARCHAR,
@@ -23,15 +23,13 @@ CREATE TABLE IF NOT EXISTS bronze_sharecity200_raw (
     lon FLOAT,
     lat FLOAT,
     comments VARCHAR,
-    date_checked VARCHAR,
-    date_modified TIMESTAMP,
     -- Metadata
     _loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- Load data from Azure stage
 -- Note: File uploaded to Azure container 'data' at bronze/duplication/
-COPY INTO bronze_sharecity200_raw (
+COPY INTO gold_fsi_200226 (
     country,
     city,
     name,
@@ -43,9 +41,7 @@ COPY INTO bronze_sharecity200_raw (
     how_it_is_shared,
     lon,
     lat,
-    comments,
-    date_checked,
-    date_modified
+    comments
 )
 FROM @stg_azure_raw/bronze/duplication/sharecity200-export-1768225380870.csv
 FILE_FORMAT = (
@@ -62,18 +58,18 @@ FILE_FORMAT = (
 ON_ERROR = 'CONTINUE';
 
 -- Validation queries
-SELECT COUNT(*) as total_rows FROM bronze_sharecity200_raw;
+SELECT COUNT(*) as total_rows FROM gold_fsi_200226;
 -- Expected: 3,140 rows
 
 SELECT
     country,
     city,
     COUNT(*) as fsi_count
-FROM bronze_sharecity200_raw
+FROM gold_fsi_200226
 GROUP BY country, city
 ORDER BY fsi_count DESC
 LIMIT 20;
 -- Top city should be Barcelona
 
 -- Check for any load errors
-SELECT * FROM TABLE(VALIDATE(bronze_sharecity200_raw, JOB_ID => '_last'));
+SELECT * FROM TABLE(VALIDATE(gold_fsi_200226, JOB_ID => '_last'));

@@ -30,7 +30,7 @@ graph LR
 - **raw_ground_truth**: Manually collected URLs for validation
 - **raw_city_language**: Language mapping for multi-lingual search
 - **raw_manual_verification**: Manual verification results (105 cities, 5 rounds)
-- **bronze_sharecity200_raw**: Pre-deduplication data (3,140 FSIs)
+- **gold_fsi_final_202602**: Pre-deduplication data (3,140 FSIs)
 - **gold_fsi_final**: Post-deduplication Gold data (3,052 FSIs)
 
 ### Silver Layer
@@ -96,7 +96,7 @@ erDiagram
         timestamp loaded_at
     }
 
-    bronze_sharecity200_raw {
+    gold_fsi_final_202602 {
         varchar country
         varchar city
         varchar name
@@ -193,7 +193,7 @@ erDiagram
     }
 
     fsi_deduplication_impact ||--o{ gold_fsi_final : "city"
-    fsi_deduplication_impact ||--o{ bronze_sharecity200_raw : "city"
+    fsi_deduplication_impact ||--o{ gold_fsi_final_202602 : "city"
     fsi_deduplication_impact {
         varchar city PK
         int fsi_count_before

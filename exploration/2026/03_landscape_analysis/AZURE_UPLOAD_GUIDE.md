@@ -157,7 +157,7 @@ Once upload is complete:
 
 2. ✅ **Verify data in Snowflake:**
    ```sql
-   SELECT COUNT(*) FROM bronze_sharecity200_raw;
+   SELECT COUNT(*) FROM gold_fsi_final_202602;
    -- Expected: 3,140 rows
    ```
 

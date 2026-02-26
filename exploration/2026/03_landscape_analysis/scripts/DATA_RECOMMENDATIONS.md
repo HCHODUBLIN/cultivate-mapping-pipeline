@@ -24,7 +24,7 @@ Based on review of the `data/bronze/` folder, cleaned up unnecessary analysis ou
   - Source dataset for deduplication analysis
   - Track changes over time
 
-**Recommended Snowflake Table:** `bronze_sharecity200_raw`
+**Recommended Snowflake Table:** `gold_fsi_final_202602`
 
 **Columns:**
 - Country, City, Name, URL
@@ -123,7 +123,7 @@ CREATE STAGE IF NOT EXISTS CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.sharecity200_stage
   CREDENTIALS = (AZURE_SAS_TOKEN = '...');
 
 -- Create table
-CREATE TABLE IF NOT EXISTS CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.bronze_sharecity200_raw (
+CREATE TABLE IF NOT EXISTS CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.gold_fsi_final_202602 (
     country VARCHAR,
     city VARCHAR,
     name VARCHAR,
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.bronze_sharecity200
 );
 
 -- Load data
-COPY INTO CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.bronze_sharecity200_raw
+COPY INTO CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.gold_fsi_final_202602
 FROM @sharecity200_stage/sharecity200-export-1768225380870.csv
 FILE_FORMAT = (
     TYPE = 'CSV'
@@ -158,7 +158,7 @@ FILE_FORMAT = (
 ### Step 3: Add to dbt sources.yml
 
 ```yaml
-  - name: bronze_sharecity200_raw
+  - name: gold_fsi_final_202602
     description: |
       Pre-deduplication ShareCity200 export (3,140 FSIs)
       Used as baseline for automated mapping across 105 cities
@@ -189,7 +189,7 @@ with pre_dedup as (
         city,
         country,
         count(*) as fsi_count_before
-    from {{ source('cultivate', 'bronze_sharecity200_raw') }}
+    from {{ source('cultivate', 'gold_fsi_final_202602') }}
     group by city, country
 ),
 

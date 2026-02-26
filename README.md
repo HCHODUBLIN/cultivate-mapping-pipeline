@@ -39,13 +39,16 @@ flowchart LR
 # 1. Set up environment
 cp .env.example .env  # fill in your credentials
 
-# 2. Run ingestion (LLM classification)
+# 2. Run ingestion prototype (prints classifications only)
 python scripts/run_ingestion.py
 
-# 3. Run dbt transformations
+# 3. Load Snowflake raw/gold tables (requires configured Snowflake + stage)
+python scripts/run_snowflake_load.py
+
+# 4. Run dbt transformations
 bash scripts/run_dbt.sh
 
-# 4. Run evaluation against reference set
+# 5. Run evaluation against reference set
 python scripts/run_evaluation.py
 ```
 
@@ -58,11 +61,10 @@ python scripts/run_evaluation.py
 - Classification accuracy: 32.0% -> 68.9% -> 74.5% across 3 major versions
   (measured on fixed reference set of 228 URLs; see `evaluation/README.md`)
 
-## Methodology
+## References
 
-Full pipeline methodology documented in:
-- Cho, H. et al. (2026), "Mapping Urban Food Sharing at Scale..." (preprint)
 - Wu, H., Cho, H. et al. (2024), ACM CIKM, DOI: [10.1145/3627673.3680090](https://doi.org/10.1145/3627673.3680090)
+- Potyagalova, A., Cho, H., Bacher, I., Wu, H., Buffini, P., Davies, A. R., Jones, G. J. F. (2026), ACM WSDM, DOI: [10.1145/3773966.3779409](https://doi.org/10.1145/3773966.3779409)
 
 ## Stack
 

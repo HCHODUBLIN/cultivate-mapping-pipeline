@@ -79,18 +79,13 @@ sources:
           - name: loaded_at
             description: Timestamp when record was loaded
 
-      - name: gold_fsi_final
-        description: Final deduplicated FSI dataset (Gold layer) - 105 cities, 3,052 FSIs
+      - name: gold_fsi_200226
+        description: Final deduplicated FSI dataset (Gold layer snapshot, 2026-02-20)
         tests:
           - dbt_utils.expression_is_true:
-              expression: "(select count(*) from {{ ref('gold_fsi_final') }}) = 3052"
-              name: gold_fsi_final_total_count_check
+              expression: "(select count(*) from {{ source('cultivate', 'gold_fsi_200226') }}) = 3052"
+              name: gold_fsi_200226_total_count_check
         columns:
-          - name: id
-            description: Unique FSI identifier
-            tests:
-              - unique
-              - not_null
           - name: name
             description: FSI name
             tests:
@@ -101,8 +96,8 @@ sources:
               - not_null
           - name: facebook_url
             description: Facebook URL
-          - name: x_url
-            description: X (Twitter) URL
+          - name: twitter_url
+            description: Twitter URL
           - name: instagram_url
             description: Instagram URL
           - name: food_sharing_activities
@@ -117,14 +112,14 @@ sources:
             description: City name
             tests:
               - not_null
-          - name: lng
+          - name: lon
             description: Longitude
           - name: lat
             description: Latitude
 
-      - name: mart_fsi_powerbi_export
+      - name: silver_fsi_201225
         description: |
-          Bronze/raw Power BI export table (3,052 FSIs)
+          Silver snapshot table before final deduplication (2025-12-20).
           date_checked stored as STRING; parse in silver layer (stg_fsi_powerbi_export)
         columns:
           - name: id
@@ -142,53 +137,6 @@ sources:
               - not_null
           - name: date_checked
             description: Raw date string (DD/MM/YYYY or empty); parsed to DATE in silver layer
-
-      - name: bronze_sharecity200_raw
-        description: |
-          ShareCity200 pre-deduplication export (3,140 FSIs)
-          Used as baseline for 105 cities automated mapping
-          Compare with gold_fsi_final to analyze deduplication impact
-        tests:
-          - dbt_utils.expression_is_true:
-              expression: "(select count(*) from {{ source('cultivate', 'bronze_sharecity200_raw') }}) = 3140"
-              name: bronze_sharecity200_total_count_check
-        columns:
-          - name: country
-            description: Country name
-            tests:
-              - not_null
-          - name: city
-            description: City name
-            tests:
-              - not_null
-          - name: name
-            description: FSI name
-            tests:
-              - not_null
-          - name: url
-            description: FSI website URL
-            tests:
-              - not_null
-          - name: instagram_url
-            description: Instagram profile URL
-          - name: twitter_url
-            description: Twitter profile URL
-          - name: facebook_url
-            description: Facebook profile URL
-          - name: food_sharing_activities
-            description: JSON string array of activities
-          - name: how_it_is_shared
-            description: JSON string array of sharing modes
-          - name: lon
-            description: Longitude
-          - name: lat
-            description: Latitude
-          - name: comments
-            description: Manual review comments
-          - name: date_checked
-            description: Date when FSI was last checked
-          - name: date_modified
-            description: Timestamp when record was last modified
 
   # Analysis source tables (2025/02 - Prompt Engineering)
   - name: analysis

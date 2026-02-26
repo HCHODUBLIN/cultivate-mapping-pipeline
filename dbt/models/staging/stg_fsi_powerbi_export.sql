@@ -1,9 +1,9 @@
 -- models/staging/stg_fsi_powerbi_export.sql
 -- Silver layer: parse date_checked STRING → DATE, QA validation
--- Source: MART_FSI_POWERBI_EXPORT (bronze/raw, all STRING dates)
+-- Source: SILVER_FSI_201225 (all STRING dates)
 
 with raw as (
-    select * from {{ source('cultivate', 'mart_fsi_powerbi_export') }}
+    select * from {{ source('cultivate', 'silver_fsi_201225') }}
 ),
 
 parsed as (

@@ -54,22 +54,7 @@ CREATE TABLE IF NOT EXISTS raw_manual_verification (
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS gold_fsi_final (
-  id STRING,
-  name STRING,
-  url STRING,
-  facebook_url STRING,
-  x_url STRING,
-  instagram_url STRING,
-  food_sharing_activities STRING,
-  how_it_is_shared STRING,
-  country STRING,
-  city STRING,
-  lng FLOAT,
-  lat FLOAT
-);
-
-CREATE TABLE IF NOT EXISTS mart_fsi_powerbi_export (
+CREATE TABLE IF NOT EXISTS silver_fsi_201225 (
   id STRING,
   city STRING,
   country STRING,
@@ -93,7 +78,7 @@ CREATE TABLE IF NOT EXISTS mart_fsi_powerbi_export (
   bartering INTEGER
 );
 
-CREATE TABLE IF NOT EXISTS bronze_sharecity200_raw (
+CREATE TABLE IF NOT EXISTS gold_fsi_200226 (
   country STRING,
   city STRING,
   name STRING,
@@ -106,7 +91,5 @@ CREATE TABLE IF NOT EXISTS bronze_sharecity200_raw (
   lon FLOAT,
   lat FLOAT,
   comments STRING,
-  date_checked STRING,
-  date_modified TIMESTAMP_NTZ,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );

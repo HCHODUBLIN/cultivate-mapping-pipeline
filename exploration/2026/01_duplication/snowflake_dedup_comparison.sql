@@ -15,8 +15,8 @@ SELECT
     COUNT(DISTINCT g.name) as fsi_count_after,
     COUNT(DISTINCT b.name) - COUNT(DISTINCT g.name) as duplicates_removed,
     ROUND((COUNT(DISTINCT b.name) - COUNT(DISTINCT g.name)) * 100.0 / COUNT(DISTINCT b.name), 2) as dedup_rate_pct
-FROM bronze_sharecity200_raw b
-FULL OUTER JOIN gold_fsi_final g ON 1=1;
+FROM silver_fsi_201225 b
+FULL OUTER JOIN gold_fsi_200226 g ON 1=1;
 
 -- City-level comparison
 WITH pre_dedup AS (
@@ -24,7 +24,7 @@ WITH pre_dedup AS (
         city,
         country,
         COUNT(*) as fsi_count_before
-    FROM bronze_sharecity200_raw
+    FROM silver_fsi_201225
     GROUP BY city, country
 ),
 post_dedup AS (
@@ -32,7 +32,7 @@ post_dedup AS (
         city,
         country,
         COUNT(*) as fsi_count_after
-    FROM gold_fsi_final
+    FROM gold_fsi_200226
     GROUP BY city, country
 )
 SELECT
@@ -61,12 +61,12 @@ ORDER BY duplicates_removed DESC NULLS LAST;
 -- Top 10 cities with most duplicates
 WITH pre_dedup AS (
     SELECT city, country, COUNT(*) as fsi_count_before
-    FROM bronze_sharecity200_raw
+    FROM silver_fsi_201225
     GROUP BY city, country
 ),
 post_dedup AS (
     SELECT city, country, COUNT(*) as fsi_count_after
-    FROM gold_fsi_final
+    FROM gold_fsi_200226
     GROUP BY city, country
 )
 SELECT
@@ -86,12 +86,12 @@ LIMIT 10;
 -- Cities with no duplicates (perfect data quality)
 WITH pre_dedup AS (
     SELECT city, country, COUNT(*) as fsi_count_before
-    FROM bronze_sharecity200_raw
+    FROM silver_fsi_201225
     GROUP BY city, country
 ),
 post_dedup AS (
     SELECT city, country, COUNT(*) as fsi_count_after
-    FROM gold_fsi_final
+    FROM gold_fsi_200226
     GROUP BY city, country
 )
 SELECT

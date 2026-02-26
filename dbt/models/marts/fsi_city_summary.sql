@@ -2,7 +2,10 @@
 -- City-level FSI statistics for 105 cities landscape analysis
 
 with fsi_data as (
-    select * from {{ source('cultivate', 'gold_fsi_final') }}
+    select
+        *,
+        md5(coalesce(url, '') || '|' || coalesce(name, '') || '|' || coalesce(city, '') || '|' || coalesce(country, '')) as fsi_id
+    from {{ source('cultivate', 'gold_fsi_200226') }}
 ),
 
 city_counts as (
@@ -10,7 +13,7 @@ city_counts as (
         city,
         country,
         count(*) as fsi_count,
-        count(distinct id) as unique_fsis
+        count(distinct fsi_id) as unique_fsis
     from fsi_data
     group by city, country
 ),

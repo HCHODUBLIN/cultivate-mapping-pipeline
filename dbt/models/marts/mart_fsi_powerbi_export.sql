@@ -1,21 +1,24 @@
 -- models/marts/mart_fsi_powerbi_export.sql
--- Transforms gold_fsi_final into flat schema expected by Power BI dashboard
+-- Transforms gold_fsi_200226 into flat schema expected by Power BI dashboard
 -- Renames columns, converts JSON arrays to semicolon-delimited text,
 -- and pivots activities/sharing modes into boolean flag columns
 
 with fsi_data as (
-    select * from {{ source('cultivate', 'gold_fsi_final') }}
+    select
+        *,
+        md5(coalesce(url, '') || '|' || coalesce(name, '') || '|' || coalesce(city, '') || '|' || coalesce(country, '')) as fsi_id
+    from {{ source('cultivate', 'gold_fsi_200226') }}
 ),
 
 transformed as (
     select
-        id,
+        fsi_id                                     as id,
         city,
         country,
         name,
         url,
         facebook_url,
-        x_url                                       as twitter_url,
+        twitter_url,
         instagram_url,
 
         -- JSON array → semicolon-separated text
@@ -29,7 +32,7 @@ transformed as (
 
         null::string                                as date_checked,
         lat,
-        lng                                         as lon,
+        lon,
         null::string                                as round,
 
         -- Boolean flags: food_sharing_activities
