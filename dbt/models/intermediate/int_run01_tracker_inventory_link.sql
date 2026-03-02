@@ -1,4 +1,4 @@
--- models/staging/stg_run01_tracker_inventory_link.sql
+-- models/intermediate/int_run01_tracker_inventory_link.sql
 -- Connect run-01 tracker with run-01 inventory and recomputed quality metrics.
 -- Metric rule:
 --   bronze_total_identified_fsi = count from Bronze(run-01) automation records
@@ -48,7 +48,7 @@ silver_metrics as (
     select
         regexp_replace(lower(coalesce(city, '')), '[^a-z0-9]', '') as city_key,
         count(*) as silver_valid_fsi
-    from {{ ref('stg_fsi_powerbi_export') }}
+    from {{ ref('int_fsi_powerbi_export') }}
     group by 1
 ),
 

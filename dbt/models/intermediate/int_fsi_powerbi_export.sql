@@ -1,10 +1,13 @@
--- models/staging/stg_fsi_powerbi_export.sql
+-- models/intermediate/int_fsi_powerbi_export.sql
 -- Silver layer normalized to stable schema used by downstream marts.
 -- Source: SILVER_FSI_201225
 
 with raw as (
     select * from {{ source('cultivate', 'silver_fsi_201225') }}
 ),
+
+-- Category normalization for how_it_is_shared is now handled downstream
+-- by int_how_shared_standardized using the how_shared_mapping seed.
 
 parsed as (
     select
