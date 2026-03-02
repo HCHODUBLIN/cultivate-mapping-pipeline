@@ -209,6 +209,7 @@ __marimo__/
 # local / private data
 data/
 *.csv
+!dbt/seeds/*.csv
 *.xlsx
 
 # macOS

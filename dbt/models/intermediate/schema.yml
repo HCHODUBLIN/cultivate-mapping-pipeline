@@ -1,0 +1,84 @@
+version: 2
+
+models:
+  - name: int_fsi_powerbi_export
+    description: |
+      Silver layer: parses date_checked from raw STRING to DATE.
+      Adds date_parse_failed flag for QA on unparseable dates.
+      Adds is_recent flag to identify records added/checked today.
+      Source: silver_fsi_201225 (snapshot/raw)
+    columns:
+      - name: id
+        description: Unique FSI identifier
+        tests:
+          - unique
+          - not_null
+      - name: date_checked
+        description: Parsed DATE (NULL if raw value was empty or unparseable)
+      - name: date_parse_failed
+        description: TRUE if raw date_checked had a value but parsing failed
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
+      - name: is_recent
+        description: TRUE if date_checked = today (newly added or re-checked record)
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
+
+  - name: int_how_shared_standardized
+    description: |
+      Standardizes HOW_IT_IS_SHARED values using the how_shared_mapping seed.
+      Splits multi-value field, maps each value to canonical form, then
+      re-aggregates. Flags records with unrecognized values for review.
+    columns:
+      - name: id
+        description: Unique FSI identifier
+        tests:
+          - unique
+          - not_null
+      - name: how_it_is_shared
+        description: Cleaned comma-separated sharing modes (Gifting, Collecting, Selling, Bartering)
+      - name: has_unrecognized_sharing_value
+        description: TRUE if any value in how_it_is_shared was not found in the seed lookup
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "= false"
+              config:
+                severity: warn
+
+  - name: int_run01_tracker_inventory_link
+    description: |
+      Run-01 tracker to run-01 bronze inventory linkage via normalized city key.
+      Metrics are recomputed from pipeline data:
+      bronze_total_identified_fsi from Bronze run-01 (automation),
+      silver_valid_fsi from Silver run-01,
+      precision_rate_pct = silver_valid_fsi / bronze_total_identified_fsi * 100.
+    columns:
+      - name: tracker_city
+        description: City name from run-01 tracker
+        tests:
+          - not_null
+          - unique
+      - name: automation_tool_version
+        description: Version from tracker CSV (e.g. V1.6, V1.10.1)
+      - name: bronze_total_identified_fsi
+        description: Total identified FSI in Bronze run-01 for the city+version
+      - name: silver_valid_fsi
+        description: Valid FSI count in Silver run-01 for the city+version
+      - name: precision_rate_pct
+        description: Precision percentage computed as silver_valid_fsi / bronze_total_identified_fsi * 100
+      - name: run01_file_count
+        description: Number of matched run-01 files for this tracker city
+      - name: has_run01_inventory_match
+        description: TRUE if at least one run-01 inventory file matched this city
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
