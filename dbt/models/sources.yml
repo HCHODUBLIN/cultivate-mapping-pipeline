@@ -69,16 +69,6 @@ sources:
             description: Source file name
           - name: loaded_at
             description: Timestamp when data was loaded
-      - name: raw_cultivate_api
-        description: JSON outputs from CULTIVATE 2026 discovery system
-        columns:
-          - name: raw_json
-            description: Full JSON payload from automation tool
-          - name: file_name
-            description: Source file name
-          - name: loaded_at
-            description: Timestamp when record was loaded
-
       - name: bronze_blob_inventory_raw
         description: Raw LIST output snapshot for Azure Bronze blob paths.
         columns:
@@ -147,7 +137,8 @@ sources:
         description: Final deduplicated FSI dataset (Gold layer snapshot, 2026-02-20)
         tests:
           - dbt_utils.expression_is_true:
-              expression: "(select count(*) from {{ source('cultivate', 'gold_fsi_200226') }}) = 3052"
+              arguments:
+                expression: "(select count(*) from {{ source('cultivate', 'gold_fsi_200226') }}) = 3052"
               name: gold_fsi_200226_total_count_check
         columns:
           - name: name
@@ -184,7 +175,7 @@ sources:
       - name: silver_fsi_201225
         description: |
           Silver snapshot table before final deduplication (2025-12-20).
-          date_checked stored as STRING; parse in silver layer (stg_fsi_powerbi_export)
+          date_checked stored as STRING; parse in silver layer (int_fsi_powerbi_export)
         columns:
           - name: id
             description: Unique FSI identifier
@@ -202,72 +193,3 @@ sources:
           - name: date_checked
             description: Raw date string (DD/MM/YYYY or empty); parsed to DATE in silver layer
 
-  # Analysis source tables (2025/02 - Prompt Engineering)
-  - name: analysis
-    database: CULTIVATE
-    schema: HC_LOAD_DATA_FROM_CLOUD
-    description: Analysis and filtering results from prompt engineering tests
-    tables:
-      - name: raw_fsi_filter_results
-        description: LLM filter decisions (include/exclude) for FSI classification
-        columns:
-          - name: url_id
-            description: Unique identifier for URL (host__hash)
-          - name: decision
-            description: LLM decision (include or exclude)
-          - name: city
-            description: City name
-          - name: url
-            description: Full URL
-          - name: loaded_at
-            description: Timestamp when filtered
-
-      - name: raw_scrape_summary
-        description: Summary of scraped text files with metadata
-        columns:
-          - name: city
-            description: City name
-          - name: url
-            description: Full URL
-          - name: url_id
-            description: Unique identifier (matches filter results)
-          - name: text_file
-            description: Path to scraped text file
-          - name: row_index
-            description: Row index in source Excel
-          - name: source_excel
-            description: Original Excel filename
-          - name: folder
-            description: Folder name (filtered/original/verified)
-
-      - name: raw_manual_verification
-        description: Manual verification results from 2025/01 test (105 cities, 5 rounds)
-        columns:
-          - name: city
-            description: City name
-          - name: url
-            description: Full URL
-          - name: name
-            description: FSI name
-          - name: is_valid
-            description: Whether URL is valid FSI (TRUE/FALSE)
-          - name: fp_category
-            description: False positive category (VALID, FP_MEDIA, FP_COMMERCIAL, etc)
-          - name: comments
-            description: Manual review comments (FP reasoning)
-          - name: activities
-            description: Food sharing activities
-          - name: how_shared
-            description: How food is shared
-          - name: round_version
-            description: Automation round version (v1.0.0, v1.1.0, v1.2.0, v1.3.0, v2.0.0)
-          - name: verified_date
-            description: Date when manual verification was performed
-          - name: lat
-            description: Latitude
-          - name: lon
-            description: Longitude
-          - name: file_name
-            description: Source file name
-          - name: loaded_at
-            description: Timestamp when data was loaded
