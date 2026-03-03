@@ -138,6 +138,7 @@ celerybeat.pid
 .env
 .envrc
 .venv
+.venv-*/
 env/
 venv/
 ENV/
@@ -228,6 +229,7 @@ exploration/**/*.txt
 # dbt
 target/
 dbt_packages/
+dbt_internal_packages/
 logs/
 dbt_modules/
 

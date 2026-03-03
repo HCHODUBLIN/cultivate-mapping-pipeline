@@ -1,8 +1,19 @@
+from __future__ import annotations
+
 import re
-import pandas as pd
-from pathlib import Path
+import sys
 import unicodedata
 from difflib import SequenceMatcher
+from pathlib import Path
+
+import pandas as pd
+
+# Allow imports from project root
+_PROJECT_ROOT = str(Path(__file__).resolve().parents[4])
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
+from utils.normalize import normalize_url
 
 sharecity_path = Path("sharecity200-export-1768225380870.csv")
 
@@ -44,7 +55,7 @@ for r in required:
             f"Columns: {list(df_share.columns)}"
         )
 
-def clean_text(x) -> str:
+def clean_text(x: object) -> str:
     if pd.isna(x):
         return ""
     x = str(x).strip()
@@ -87,21 +98,8 @@ dup_share[dup_cols + ["match_key"]].to_csv(
 print("Saved:")
 print("  duplicates_sharecity_by_key.csv")
 
-def normalise_url(u) -> str:
-    if pd.isna(u):
-        return ""
-    u = str(u).strip()
-    u = unicodedata.normalize("NFKC", u)
-    u = u.casefold()
-    u = re.sub(r"#.*$", "", u)               
-    u = re.sub(r"\?.*$", "", u)              
-    u = re.sub(r"^https?://", "", u)         
-    u = re.sub(r"^www\.", "", u)             
-    u = u.rstrip("/")
-    return u
-
 if "url" in df_share.columns:
-    df_share["url__key"] = df_share["url"].map(normalise_url)
+    df_share["url__key"] = df_share["url"].map(normalize_url)
 
     df_share["city_country_url_key"] = (
         df_share["country__key"] + " | " +

@@ -4,39 +4,24 @@ Similarity-based URL Matching Analysis for CULTIVATE Mapping Pipeline
 Provides detailed string similarity analysis for manual review
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
+from __future__ import annotations
+
+import sys
 from datetime import datetime
-import re
 from difflib import SequenceMatcher
-from urllib.parse import urlparse
+from pathlib import Path
+
+import pandas as pd
+
+# Allow imports from project root
+_PROJECT_ROOT = str(Path(__file__).resolve().parents[3])
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
+from utils.normalize import extract_domain, normalize_url
 
 
-def normalize_url(url):
-    """Normalize URL for matching"""
-    if pd.isna(url):
-        return ''
-    url = str(url).strip()
-    url = re.sub(r'^https?://(www\.)?', '', url, flags=re.IGNORECASE)
-    url = re.sub(r'[?#].*$', '', url)
-    url = re.sub(r'/+$', '', url)
-    url = re.sub(r"'+$", '', url)
-    url = re.sub(r'\s+', '', url)
-    return url.lower()
-
-
-def extract_domain(url):
-    """Extract domain from URL"""
-    if pd.isna(url):
-        return ''
-    url = str(url).strip()
-    url = re.sub(r'^https?://(www\.)?', '', url, flags=re.IGNORECASE)
-    url = re.sub(r'/.*$', '', url)
-    return url.lower()
-
-
-def extract_path_segments(url_norm):
+def extract_path_segments(url_norm: str | None) -> list[str]:
     """Extract path segments from normalized URL"""
     if pd.isna(url_norm) or not url_norm:
         return []
@@ -52,7 +37,7 @@ def extract_path_segments(url_norm):
     return segments
 
 
-def calculate_string_similarity(str1, str2):
+def calculate_string_similarity(str1: object, str2: object) -> float:
     """
     Calculate string similarity using SequenceMatcher (similar to Levenshtein)
     Returns similarity ratio from 0 to 1
@@ -66,7 +51,7 @@ def calculate_string_similarity(str1, str2):
     return SequenceMatcher(None, str1, str2).ratio()
 
 
-def calculate_token_similarity(str1, str2):
+def calculate_token_similarity(str1: object, str2: object) -> float:
     """
     Calculate token-based similarity (Jaccard similarity)
     Splits strings by / and calculates overlap
@@ -89,15 +74,15 @@ def calculate_token_similarity(str1, str2):
 class SimilarityAnalyzer:
     """Analyzer for URL similarity matching"""
 
-    def __init__(self, data_dir='data'):
+    def __init__(self, data_dir: str | Path = "data") -> None:
         """Initialize analyzer with data directory"""
         self.data_dir = Path(data_dir)
-        self.ground_truth = None
-        self.automation = None
-        self.automation_reviewed = None
-        self.city_language = None
+        self.ground_truth: pd.DataFrame | None = None
+        self.automation: pd.DataFrame | None = None
+        self.automation_reviewed: pd.DataFrame | None = None
+        self.city_language: pd.DataFrame | None = None
 
-    def load_data(self):
+    def load_data(self) -> None:
         """Load all CSV files"""
         print("Loading data files...")
 
@@ -173,7 +158,7 @@ class SimilarityAnalyzer:
         print(f"  Automation: {len(self.automation)} URLs")
         print(f"  Cities: {self.city_language['city'].nunique()}")
 
-    def find_similar_urls(self, city_filter=None, min_similarity=0.0):
+    def find_similar_urls(self, city_filter: str | None = None, min_similarity: float = 0.0) -> pd.DataFrame:
         """
         Find similar URLs between ground truth and automation
 
@@ -272,7 +257,7 @@ class SimilarityAnalyzer:
         print(f"\nFound {len(df)} potential matches")
         return df
 
-    def generate_review_report(self, output_dir='reports', min_similarity=30.0):
+    def generate_review_report(self, output_dir: str | Path = "reports", min_similarity: float = 30.0) -> None:
         """Generate manual review report with similarity scores"""
         output_dir = Path(output_dir)
         output_dir.mkdir(exist_ok=True)
@@ -355,7 +340,7 @@ class SimilarityAnalyzer:
         print("\nAnalysis complete!")
 
 
-def main():
+def main() -> None:
     """Main execution function"""
     print("="*80)
     print("CULTIVATE Similarity-Based URL Matching")

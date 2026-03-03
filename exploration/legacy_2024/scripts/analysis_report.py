@@ -3,79 +3,42 @@ Analysis Report for CULTIVATE Mapping Pipeline
 Analyzes automation recall and precision metrics by language and version
 """
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import re
-from pathlib import Path
+from __future__ import annotations
+
+import sys
 from datetime import datetime
-from urllib.parse import urlparse
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib.figure import Figure
+
+# Allow imports from project root
+_PROJECT_ROOT = str(Path(__file__).resolve().parents[3])
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
+from utils.normalize import extract_domain, normalize_url
 
 sns.set_style("whitegrid")
-plt.rcParams['figure.figsize'] = (12, 8)
-plt.rcParams['font.size'] = 10
-
-
-def normalize_url(url):
-    """
-    Normalize URL for matching (matches dbt logic in stg_ground_truth.sql)
-
-    Normalization steps:
-    1. Remove http:// or https://
-    2. Remove www.
-    3. Remove query parameters and fragments
-    4. Remove trailing slashes
-    5. Remove trailing quotes
-    6. Remove whitespace
-    7. Convert to lowercase
-    """
-    if pd.isna(url):
-        return ''
-
-    url = str(url).strip()
-    url = re.sub(r'^https?://(www\.)?', '', url, flags=re.IGNORECASE)
-    url = re.sub(r'[?#].*$', '', url)
-    url = re.sub(r'/+$', '', url)
-    url = re.sub(r"'+$", '', url)
-    url = re.sub(r'\s+', '', url)
-    url = url.lower()
-
-    return url
-
-
-def extract_domain(url):
-    """
-    Extract domain from URL (matches dbt logic in stg_ground_truth.sql)
-
-    Examples:
-    - https://www.example.com/path -> example.com
-    - example.com/path -> example.com
-    - https://example.com -> example.com
-    """
-    if pd.isna(url):
-        return ''
-
-    url = str(url).strip()
-    url = re.sub(r'^https?://(www\.)?', '', url, flags=re.IGNORECASE)
-    url = re.sub(r'/.*$', '', url)
-    url = url.lower()
-
-    return url
+plt.rcParams["figure.figsize"] = (12, 8)
+plt.rcParams["font.size"] = 10
 
 
 class CultivateAnalyzer:
     """Analyzer for CULTIVATE mapping pipeline data"""
 
-    def __init__(self, data_dir='data'):
+    def __init__(self, data_dir: str | Path = "data") -> None:
         """Initialize analyzer with data directory"""
         self.data_dir = Path(data_dir)
-        self.ground_truth = None
-        self.automation = None
-        self.automation_reviewed = None
-        self.city_language = None
+        self.ground_truth: pd.DataFrame | None = None
+        self.automation: pd.DataFrame | None = None
+        self.automation_reviewed: pd.DataFrame | None = None
+        self.city_language: pd.DataFrame | None = None
 
-    def load_data(self):
+    def load_data(self) -> None:
         """Load all CSV files"""
         print("Loading data files...")
 
@@ -140,7 +103,7 @@ class CultivateAnalyzer:
         print(f"  Cities: {self.city_language['city'].nunique()}")
         print(f"  Languages: {self.city_language['search_language'].nunique()}")
 
-    def calculate_recall(self, group_by=None):
+    def calculate_recall(self, group_by: str | list[str] | None = None) -> pd.DataFrame:
         """
         Calculate recall: what % of ground_truth was found by automation?
         Uses DOMAIN-LEVEL matching.
@@ -182,7 +145,7 @@ class CultivateAnalyzer:
 
         return recall
 
-    def calculate_precision(self, group_by=None):
+    def calculate_precision(self, group_by: str | list[str] | None = None) -> pd.DataFrame:
         """
         Calculate precision: what % of automation results are correct?
 
@@ -218,13 +181,13 @@ class CultivateAnalyzer:
 
         return precision
 
-    def calculate_f1_score(self, recall_pct, precision_pct):
+    def calculate_f1_score(self, recall_pct: float, precision_pct: float) -> float:
         """Calculate F1 score from recall and precision percentages"""
         if recall_pct > 0 and precision_pct > 0:
             return round(2 * (recall_pct * precision_pct) / (recall_pct + precision_pct), 2)
         return 0.0
 
-    def get_metrics_by_language(self):
+    def get_metrics_by_language(self) -> pd.DataFrame:
         """Get combined metrics by language"""
         recall = self.calculate_recall('search_language')
         precision = self.calculate_precision('search_language')
@@ -243,11 +206,11 @@ class CultivateAnalyzer:
 
         return metrics.reset_index()
 
-    def get_metrics_by_version(self):
+    def get_metrics_by_version(self) -> pd.DataFrame:
         """Get precision metrics by version"""
         return self.calculate_precision('version').reset_index()
 
-    def get_metrics_detailed(self):
+    def get_metrics_detailed(self) -> pd.DataFrame:
         """Get detailed metrics by city, language, and version"""
         recall = self.calculate_recall(['city', 'search_language'])
         precision = self.calculate_precision(['city', 'search_language', 'version'])
@@ -265,7 +228,7 @@ class CultivateAnalyzer:
 
         return metrics
 
-    def get_missing_ground_truth(self):
+    def get_missing_ground_truth(self) -> pd.DataFrame:
         """Get ground truth URLs not found by automation"""
         gt_with_match = self.ground_truth.copy()
         gt_with_match['found'] = gt_with_match['source_url_norm'].isin(
@@ -278,7 +241,7 @@ class CultivateAnalyzer:
 
         return missing.sort_values(['city', 'ground_truth_id'])
 
-    def get_false_positives(self):
+    def get_false_positives(self) -> pd.DataFrame:
         """Get automation results marked as incorrect"""
         false_pos = self.automation[~self.automation['is_included_bool']][
             ['automation_id', 'city', 'search_language', 'run_id', 'version', 'source_url']
@@ -286,7 +249,7 @@ class CultivateAnalyzer:
 
         return false_pos.sort_values(['city', 'run_id', 'automation_id'])
 
-    def plot_metrics_by_language(self, save_path=None):
+    def plot_metrics_by_language(self, save_path: str | Path | None = None) -> Figure:
         """Create visualization of metrics by language"""
         metrics = self.get_metrics_by_language()
 
@@ -367,7 +330,7 @@ class CultivateAnalyzer:
 
         return fig
 
-    def plot_metrics_by_version(self, save_path=None):
+    def plot_metrics_by_version(self, save_path: str | Path | None = None) -> Figure:
         """Create visualization of metrics by version"""
         metrics = self.get_metrics_by_version()
 
@@ -402,7 +365,7 @@ class CultivateAnalyzer:
 
         return fig
 
-    def generate_report(self, output_dir='reports'):
+    def generate_report(self, output_dir: str | Path = "reports") -> Path:
         """Generate comprehensive analysis report"""
         output_dir = Path(output_dir)
         output_dir.mkdir(exist_ok=True)
@@ -494,7 +457,7 @@ class CultivateAnalyzer:
         return report_path
 
 
-def main():
+def main() -> None:
     """Main execution function"""
     print("="*80)
     print("CULTIVATE Mapping Pipeline Analysis")

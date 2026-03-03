@@ -4,10 +4,13 @@ Azure Blob Storage Sync Script
 Sync files between local directory and Azure Blob Storage
 """
 
+from __future__ import annotations
+
 import os
 from pathlib import Path
-from azure.storage.blob import BlobServiceClient
+
 from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -24,13 +27,13 @@ if not STORAGE_ACCOUNT_NAME:
         "Please create a .env file from .env.example and set your Azure Storage Account name."
     )
 
-def get_blob_service_client():
+def get_blob_service_client() -> BlobServiceClient:
     """Get authenticated blob service client"""
     account_url = f"https://{STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
     credential = DefaultAzureCredential()
     return BlobServiceClient(account_url, credential=credential)
 
-def download_blob(blob_name, local_path):
+def download_blob(blob_name: str, local_path: Path) -> None:
     """Download a single blob to local file"""
     print(f"Downloading: {blob_name} -> {local_path}")
 
@@ -50,7 +53,7 @@ def download_blob(blob_name, local_path):
 
     print(f"✓ Downloaded: {local_path}")
 
-def upload_blob(local_path, blob_name):
+def upload_blob(local_path: Path, blob_name: str) -> None:
     """Upload a local file to blob"""
     print(f"Uploading: {local_path} -> {blob_name}")
 
@@ -66,7 +69,7 @@ def upload_blob(local_path, blob_name):
 
     print(f"✓ Uploaded: {blob_name}")
 
-def list_blobs(prefix=""):
+def list_blobs(prefix: str = "") -> None:
     """List all blobs in container with optional prefix"""
     blob_service_client = get_blob_service_client()
     container_client = blob_service_client.get_container_client(CONTAINER_NAME)
@@ -81,7 +84,7 @@ def list_blobs(prefix=""):
 
     print("-" * 80)
 
-def download_all(prefix="", local_dir=None):
+def download_all(prefix: str = "", local_dir: Path | None = None) -> None:
     """Download all blobs with given prefix"""
     if local_dir is None:
         local_dir = LOCAL_BASE_DIR
@@ -95,7 +98,7 @@ def download_all(prefix="", local_dir=None):
         local_path = local_dir / blob.name
         download_blob(blob.name, local_path)
 
-def upload_directory(local_dir, blob_prefix=""):
+def upload_directory(local_dir: str | Path, blob_prefix: str = "") -> None:
     """Upload entire directory to blob storage"""
     local_dir = Path(local_dir)
 
@@ -107,7 +110,7 @@ def upload_directory(local_dir, blob_prefix=""):
 
             upload_blob(local_path, blob_name)
 
-def main():
+def main() -> None:
     """Main function with example usage"""
     import sys
 
