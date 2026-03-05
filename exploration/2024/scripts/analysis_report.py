@@ -20,6 +20,7 @@ _PROJECT_ROOT = str(Path(__file__).resolve().parents[3])
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
+from evaluation.f1_score import f1_score
 from utils.normalize import extract_domain, normalize_url
 
 sns.set_style("whitegrid")
@@ -182,10 +183,7 @@ class CultivateAnalyzer:
         return precision
 
     def calculate_f1_score(self, recall_pct: float, precision_pct: float) -> float:
-        """Calculate F1 score from recall and precision percentages"""
-        if recall_pct > 0 and precision_pct > 0:
-            return round(2 * (recall_pct * precision_pct) / (recall_pct + precision_pct), 2)
-        return 0.0
+        return round(f1_score(precision_pct, recall_pct), 2)
 
     def get_metrics_by_language(self) -> pd.DataFrame:
         """Get combined metrics by language"""

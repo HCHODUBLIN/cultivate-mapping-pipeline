@@ -17,10 +17,8 @@ Snowflake auth is read from environment variables:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 import argparse
-import os
 import re
 import sys
 
@@ -30,6 +28,12 @@ try:
     import snowflake.connector
 except ImportError:  # pragma: no cover
     snowflake = None  # type: ignore[assignment]
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from utils.snowflake_auth import load_auth, validate_auth  # noqa: E402
 
 
 DEST_TABLE = "RAW_SHARECITY200_TRACKER_RUN01"
@@ -81,40 +85,6 @@ SOURCE_TO_DEST = {
     "name_accuracy_rate": "name_accuracy_rate",
 }
 
-
-@dataclass(frozen=True)
-class SnowflakeAuth:
-    account: str
-    user: str
-    password: str
-    warehouse: str
-    database: str
-    schema: str
-    role: str
-
-
-def env(name: str, default: str = "") -> str:
-    return os.getenv(name, default).strip()
-
-
-def load_auth() -> SnowflakeAuth:
-    return SnowflakeAuth(
-        account=env("SNOWFLAKE_ACCOUNT"),
-        user=env("SNOWFLAKE_USER"),
-        password=env("SNOWFLAKE_PASSWORD"),
-        warehouse=env("SNOWFLAKE_WAREHOUSE"),
-        database=env("SNOWFLAKE_DATABASE"),
-        schema=env("SNOWFLAKE_SCHEMA"),
-        role=env("SNOWFLAKE_ROLE", "ACCOUNTADMIN"),
-    )
-
-
-def validate_auth(auth: SnowflakeAuth) -> list[str]:
-    missing = []
-    for field in ("account", "user", "password", "warehouse", "database", "schema"):
-        if not getattr(auth, field):
-            missing.append(field.upper())
-    return missing
 
 
 def normalize_header(name: str) -> str:
