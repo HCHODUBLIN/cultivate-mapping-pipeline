@@ -98,7 +98,44 @@ FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 FORCE = TRUE
 ;
 
--- (H) bronze blob inventory snapshot (for dbt stg_bronze_blob_inventory source)
+-- (I) raw_bronze_fsi (automation-discovered FSIs, all runs)
+-- CSVs at data/bronze/run-XX-csv/ with 13 columns:
+-- City, Country, Name, URL, Facebook URL, Twitter URL, Instagram URL,
+-- Food Sharing Activities, How it is Shared, Date Checked, Comments, Lat, Lon
+COPY INTO raw_bronze_fsi (
+  city, country, name, url,
+  facebook_url, twitter_url, instagram_url,
+  food_sharing_activities, how_it_is_shared,
+  date_checked, comments, lat, lon, file_name
+)
+FROM (
+  SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, METADATA$FILENAME
+  FROM @stg_azure_raw
+)
+PATTERN = '.*data/bronze/run-0[1-4]-csv/.*\.csv'
+FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
+FORCE = TRUE
+;
+
+-- (J) raw_silver_fsi (manually verified FSIs, all runs)
+-- CSVs at data/silver/run-XX-csv/ with same 13 columns as bronze.
+-- Silver is a subset of bronze (false positives removed by manual review).
+COPY INTO raw_silver_fsi (
+  city, country, name, url,
+  facebook_url, twitter_url, instagram_url,
+  food_sharing_activities, how_it_is_shared,
+  date_checked, comments, lat, lon, file_name
+)
+FROM (
+  SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, METADATA$FILENAME
+  FROM @stg_azure_raw
+)
+PATTERN = '.*data/silver/run-0[1-4]-csv/.*\.csv'
+FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
+FORCE = TRUE
+;
+
+-- (K) bronze blob inventory snapshot (for dbt stg_bronze_blob_inventory source)
 TRUNCATE TABLE bronze_blob_inventory_raw;
 
 LIST @stg_azure_raw PATTERN = '.*data/bronze/.*';

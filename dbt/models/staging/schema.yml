@@ -142,6 +142,46 @@ models:
         tests:
           - not_null
 
+  - name: stg_bronze_fsi
+    description: |
+      Automation-discovered FSIs from all runs (run-01 to run-04).
+      URL normalized, run derived from file path.
+    columns:
+      - name: id
+        description: Stable row ID (MD5 of url + city + country + run)
+        tests:
+          - not_null
+      - name: city
+        description: City name (lowercased, trimmed)
+        tests:
+          - not_null
+      - name: country
+        description: Country name (lowercased, trimmed)
+        tests:
+          - not_null
+      - name: run
+        description: Run identifier (run-01 to run-04)
+
+  - name: stg_silver_fsi
+    description: |
+      Manually verified FSIs from all runs (run-01 to run-04).
+      Silver is a subset of bronze (false positive rows removed by review).
+    columns:
+      - name: id
+        description: Stable row ID (MD5 of url + city + country + run)
+        tests:
+          - not_null
+      - name: city
+        description: City name (lowercased, trimmed)
+        tests:
+          - not_null
+      - name: country
+        description: Country name (lowercased, trimmed)
+        tests:
+          - not_null
+      - name: run
+        description: Run identifier (run-01 to run-04)
+
   - name: stg_city_language
     description: Language mapping for each city
     columns:
