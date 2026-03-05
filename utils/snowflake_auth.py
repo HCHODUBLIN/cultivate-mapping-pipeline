@@ -39,3 +39,20 @@ def validate_auth(auth: SnowflakeAuth) -> list[str]:
         if not getattr(auth, field):
             missing.append(field.upper())
     return missing
+
+
+def connect(auth: SnowflakeAuth):
+    """Create a Snowflake connection from an auth object."""
+    import snowflake.connector
+
+    kwargs = {
+        "account": auth.account,
+        "user": auth.user,
+        "password": auth.password,
+        "warehouse": auth.warehouse,
+        "database": auth.database,
+        "schema": auth.schema,
+    }
+    if auth.role:
+        kwargs["role"] = auth.role
+    return snowflake.connector.connect(**kwargs)

@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from utils.snowflake_auth import load_auth, validate_auth  # noqa: E402
+from utils.snowflake_auth import connect, load_auth, validate_auth  # noqa: E402
 
 SNOWFLAKE_DIR = ROOT / "snowflake"
 
@@ -73,14 +73,7 @@ def main() -> int:
         SNOWFLAKE_DIR / "06_validation.sql",
     ]
 
-    conn = snowflake.connector.connect(
-        account=auth.account,
-        user=auth.user,
-        password=auth.password,
-        warehouse=auth.warehouse,
-        database=auth.database,
-        schema=auth.schema,
-    )
+    conn = connect(auth)
     try:
         with conn.cursor() as cur:
             for sql_file in sql_flow:

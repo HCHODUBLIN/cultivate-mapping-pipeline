@@ -13,17 +13,10 @@ _PROJECT_ROOT = str(Path(__file__).resolve().parents[4])
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
+from utils.io import read_csv_robust
 from utils.normalize import normalize_url
 
 sharecity_path = Path("sharecity200-export-1768225380870.csv")
-
-def read_csv_robust(path: Path) -> pd.DataFrame:
-    for enc in ("utf-8", "utf-8-sig", "cp1252", "latin1"):
-        try:
-            return pd.read_csv(path, encoding=enc)
-        except UnicodeDecodeError:
-            continue
-    return pd.read_csv(path, encoding="latin1")
 
 df_share = read_csv_robust(sharecity_path)
 

@@ -33,7 +33,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from utils.snowflake_auth import load_auth, validate_auth  # noqa: E402
+from utils.snowflake_auth import connect, load_auth, validate_auth  # noqa: E402
 
 
 DEST_TABLE = "RAW_SHARECITY200_TRACKER_RUN01"
@@ -215,15 +215,7 @@ def main() -> int:
     df = load_xlsx(xlsx_path, sheet_name=sheet_name)
     rows = list(df.itertuples(index=False, name=None))
 
-    conn = snowflake.connector.connect(
-        account=auth.account,
-        user=auth.user,
-        password=auth.password,
-        warehouse=auth.warehouse,
-        database=auth.database,
-        schema=auth.schema,
-        role=auth.role,
-    )
+    conn = connect(auth)
     try:
         with conn.cursor() as cur:
             create_table_if_needed(cur)
