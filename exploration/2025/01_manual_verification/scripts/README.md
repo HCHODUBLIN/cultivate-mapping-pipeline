@@ -101,7 +101,7 @@ To run compilation locally:
 ls data/bronze/false-positive/
 
 # 2. Install dependencies
-cd exploration/legacy_2025/01/scripts
+cd exploration/2025/01_manual_verification/scripts
 pip install -r requirements.txt
 
 # 3. Run compilation script

@@ -173,5 +173,5 @@ pip install dbt-snowflake
 ## Related Work
 
 - **Deduplication:** See [../01/scripts/](../01/scripts/detect_duplicates.py)
-- **Manual Verification:** See [../../legacy_2025/01/](../../legacy_2025/01/)
-- **Automation Improvement:** See [../../legacy_2025/02/](../../legacy_2025/02/)
+- **Manual Verification:** See [../../2025/01_manual_verification/](../../2025/01_manual_verification/)
+- **Automation Improvement:** See [../../2025/02_automation_improvement/](../../2025/02_automation_improvement/)

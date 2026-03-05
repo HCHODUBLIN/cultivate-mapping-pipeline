@@ -6,12 +6,11 @@ Infrastructure and DevOps utilities for the CULTIVATE mapping pipeline.
 
 ```
 infra/
-├── infrastructure/
-│   └── azure/              # Azure Blob Storage integration
-│       ├── install_cli.sh  # Install Azure CLI
-│       ├── blob_sync.py    # Python script for blob operations
-│       └── sync.sh         # Shell wrapper for syncing
-└── (reserved for future scripts)
+├── azure/                    # Azure Blob Storage integration
+│   └── azure_blob_sync.py   # Python CLI for blob operations
+└── scripts/
+    ├── convert_gold_to_powerbi_csv.py
+    └── convert_powerbi_to_gold.py
 ```
 
 ## Infrastructure Scripts
@@ -36,7 +35,7 @@ cp .env.example .env
 
 2. Install Azure CLI:
 ```bash
-./infra/infrastructure/azure/install_cli.sh
+./infra/azure/install_cli.sh
 
 # Authenticate
 az login
@@ -50,14 +49,14 @@ pip install azure-storage-blob azure-identity python-dotenv
 **Usage:**
 ```bash
 # Sync data to Azure
-./infra/infrastructure/azure/sync.sh upload-all ./data
+./infra/azure/sync.sh upload-all ./data
 
 # Download from Azure
-./infra/infrastructure/azure/sync.sh download-all
+./infra/azure/sync.sh download-all
 
 # Use Python script directly for more control
-python infra/infrastructure/azure/blob_sync.py list raw/
-python infra/infrastructure/azure/blob_sync.py upload ./data/file.csv raw/file.csv
+python infra/azure/blob_sync.py list raw/
+python infra/azure/blob_sync.py upload ./data/file.csv raw/file.csv
 ```
 
 ---
@@ -65,9 +64,9 @@ python infra/infrastructure/azure/blob_sync.py upload ./data/file.csv raw/file.c
 ## Analysis Scripts
 
 Note: Analysis-specific scripts are organized by research phase under `exploration/*/scripts/`:
-- `exploration/legacy_2024/scripts/` - Original 2024 analysis scripts (completed)
-- `exploration/legacy_2025/01/scripts/` - Manual verification compilation (2025/01, completed)
-- `exploration/legacy_2025/02/scripts/` - Prompt engineering experiments (2025/02, completed)
+- `exploration/2024/scripts/` - Original 2024 analysis scripts (completed)
+- `exploration/2025/01/scripts/` - Manual verification compilation (2025/01, completed)
+- `exploration/2025/02/scripts/` - Prompt engineering experiments (2025/02, completed)
 - `exploration/2026/01/scripts/` - Duplication detection (2026/01, completed)
 - `exploration/2026/02/scripts/` - Query design improvements (2026/02, in progress)
 

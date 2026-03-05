@@ -70,5 +70,5 @@
 ---
 
 **Related Work:**
-- See [analysis issue tracker](../../legacy_2025/) for historical context
+- See [analysis issue tracker](../../2025/) for historical context
 - Duplication detection: [../01/scripts/](../01/scripts/)

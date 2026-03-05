@@ -6,14 +6,14 @@ This directory contains structured analysis tests and experiments used to evalua
 
 ```
 exploration/
-├── legacy_2024/ # Original 2024 analysis scripts
-├── legacy_2025/ # Completed 2025 analysis work
-│ ├── 01_manual_verification/ # Manual Verification (Jan 2025)
-│ └── 02_automation_improvement/ # Automation Improvement (Feb 2025)
-├── 2026/ # Ongoing 2026 analysis work
-│ ├── 01_duplication/ # Duplication Check (Jan 2026) - Completed
-│ ├── 02_query_design/ # Query Design Improvements (Feb 2026) - In Progress
-│ └── 03_landscape_analysis/ # FSI Landscape Analysis (Mar 2026)
+├── 2024/                         # Original 2024 analysis scripts
+├── 2025/                         # Completed 2025 analysis work
+│   ├── 01_manual_verification/   # Manual Verification (Jan 2025)
+│   └── 02_automation_improvement/ # Automation Improvement (Feb 2025)
+└── 2026/                         # Ongoing 2026 analysis work
+    ├── 01_duplication/           # Duplication Check (Jan 2026) - Completed
+    ├── 02_query_design/          # Query Design Improvements (Feb 2026) - In Progress
+    └── 03_landscape_analysis/    # FSI Landscape Analysis (Mar 2026)
 ```
 
 **Note:**
@@ -31,7 +31,7 @@ exploration/
 #### Pipeline Evaluation
 
 - **Status:** Completed
-- **Location:** `legacy_2024/`
+- **Location:** `2024/`
 - **Description:** Domain-level and similarity-based matching for recall/precision evaluation
 
 ---

@@ -93,7 +93,7 @@ python build_fsi_included_dataset.py
 **Python environment:**
 
 ```bash
-cd exploration/legacy_2025/02/scripts
+cd exploration/2025/02_automation_improvement/scripts
 pip install -r requirements.txt
 ```
 
