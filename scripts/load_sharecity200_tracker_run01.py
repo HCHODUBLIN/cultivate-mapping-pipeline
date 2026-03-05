@@ -186,11 +186,12 @@ def create_table_if_needed(cur) -> None:
 
 def insert_rows(cur, rows: list[tuple], truncate_first: bool) -> None:
     if truncate_first:
-        cur.execute(f"truncate table {DEST_TABLE}")
+        cur.execute(f"truncate table identifier('{DEST_TABLE}')")
 
     placeholders = ", ".join(["%s"] * len(DEST_COLUMNS))
+    cols = ", ".join(DEST_COLUMNS)
     insert_sql = (
-        f"insert into {DEST_TABLE} ({', '.join(DEST_COLUMNS)}) values ({placeholders})"
+        f"insert into identifier('{DEST_TABLE}') ({cols}) values ({placeholders})"
     )
     cur.executemany(insert_sql, rows)
 

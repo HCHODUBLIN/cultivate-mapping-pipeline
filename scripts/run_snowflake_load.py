@@ -129,7 +129,7 @@ def main() -> int:
                 "gold_fsi_200226",
             ]
             for table in tables:
-                cur.execute(f"select count(*) from {table}")
+                cur.execute(f"select count(*) from identifier('{table}')")
                 count = cur.fetchone()[0]
                 print(f"{table:28s} {count}")
     finally:
