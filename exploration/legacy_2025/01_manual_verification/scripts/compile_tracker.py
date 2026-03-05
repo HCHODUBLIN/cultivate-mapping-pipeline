@@ -17,8 +17,6 @@ import pandas as pd
 from pathlib import Path
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
-import re
-from typing import Dict, List
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent.parent.parent.parent

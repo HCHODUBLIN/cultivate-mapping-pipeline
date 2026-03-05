@@ -1,4 +1,3 @@
-import os
 import argparse
 import pathlib
 import pandas as pd
@@ -229,7 +228,6 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    run_dir = args.run_dir
     source_dir = args.source_dir
     scraped_base = args.scraped_base
     filter_csv = args.filter_csv
