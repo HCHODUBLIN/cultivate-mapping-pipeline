@@ -64,44 +64,6 @@ CREATE TABLE IF NOT EXISTS raw_sharecity200_tracker_run01 (
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS raw_bronze_fsi (
-  run_id STRING,
-  source_file STRING,
-  city STRING,
-  country STRING,
-  name STRING,
-  url STRING,
-  facebook_url STRING,
-  twitter_url STRING,
-  instagram_url STRING,
-  food_sharing_activities STRING,
-  how_it_is_shared STRING,
-  date_checked STRING,
-  comments STRING,
-  lat FLOAT,
-  lon FLOAT,
-  loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
-);
-
-CREATE TABLE IF NOT EXISTS raw_silver_fsi (
-  run_id STRING,
-  source_file STRING,
-  city STRING,
-  country STRING,
-  name STRING,
-  url STRING,
-  facebook_url STRING,
-  twitter_url STRING,
-  instagram_url STRING,
-  food_sharing_activities STRING,
-  how_it_is_shared STRING,
-  date_checked STRING,
-  comments STRING,
-  lat FLOAT,
-  lon FLOAT,
-  loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
-);
-
 CREATE TABLE IF NOT EXISTS silver_fsi_201225 (
   id STRING,
   city STRING,

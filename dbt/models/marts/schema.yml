@@ -234,51 +234,6 @@ models:
                 min_value: 0
                 inclusive: true
 
-  - name: mart_bronze_silver_comparison
-    description: |
-      Bronze vs Silver precision metrics per city and run.
-      Precision = silver_count / bronze_count (what % of automation results are valid).
-    columns:
-      - name: city
-        description: City name
-        tests:
-          - not_null
-      - name: country
-        description: Country name
-        tests:
-          - not_null
-      - name: run
-        description: Run identifier
-      - name: bronze_fsi_count
-        description: Total FSIs found by automation
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
-      - name: silver_fsi_count
-        description: Total validated FSIs
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                inclusive: true
-      - name: false_positive_count
-        description: Bronze - Silver (unvalidated FSIs)
-        tests:
-          - not_null
-      - name: precision_pct
-        description: Precision percentage (silver / bronze * 100)
-        tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0
-                max_value: 100
-                inclusive: true
-
   # Power BI Export Model
   - name: mart_fsi_powerbi_export
     description: |
