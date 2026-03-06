@@ -65,6 +65,8 @@ CREATE TABLE IF NOT EXISTS raw_sharecity200_tracker_run01 (
 );
 
 CREATE TABLE IF NOT EXISTS raw_bronze_fsi (
+  run_id STRING,
+  source_file STRING,
   city STRING,
   country STRING,
   name STRING,
@@ -78,11 +80,12 @@ CREATE TABLE IF NOT EXISTS raw_bronze_fsi (
   comments STRING,
   lat FLOAT,
   lon FLOAT,
-  file_name STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE TABLE IF NOT EXISTS raw_silver_fsi (
+  run_id STRING,
+  source_file STRING,
   city STRING,
   country STRING,
   name STRING,
@@ -96,7 +99,6 @@ CREATE TABLE IF NOT EXISTS raw_silver_fsi (
   comments STRING,
   lat FLOAT,
   lon FLOAT,
-  file_name STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 

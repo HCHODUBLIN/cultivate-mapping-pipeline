@@ -138,6 +138,10 @@ sources:
           Automation-discovered FSIs from all runs (run-01 to run-04).
           Loaded from CSV files at data/bronze/run-XX-csv/.
         columns:
+          - name: run_id
+            description: Run identifier extracted from file path (e.g. run-01)
+          - name: source_file
+            description: Full source file path from Azure stage
           - name: city
             description: City name
             tests:
@@ -168,8 +172,6 @@ sources:
             description: Latitude
           - name: lon
             description: Longitude
-          - name: file_name
-            description: Source file path from Azure stage
           - name: loaded_at
             description: Row ingestion timestamp
 
@@ -179,6 +181,10 @@ sources:
           Same 13-column schema as bronze. Silver is a subset of bronze
           (false positive rows removed by manual review).
         columns:
+          - name: run_id
+            description: Run identifier extracted from file path (e.g. run-01)
+          - name: source_file
+            description: Full source file path from Azure stage
           - name: city
             description: City name
             tests:
@@ -191,8 +197,6 @@ sources:
             description: FSI name
           - name: url
             description: FSI website URL
-          - name: file_name
-            description: Source file path from Azure stage
           - name: loaded_at
             description: Row ingestion timestamp
 

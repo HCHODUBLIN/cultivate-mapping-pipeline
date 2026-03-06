@@ -103,17 +103,23 @@ FORCE = TRUE
 -- City, Country, Name, URL, Facebook URL, Twitter URL, Instagram URL,
 -- Food Sharing Activities, How it is Shared, Date Checked, Comments, Lat, Lon
 COPY INTO raw_bronze_fsi (
+  run_id, source_file,
   city, country, name, url,
   facebook_url, twitter_url, instagram_url,
   food_sharing_activities, how_it_is_shared,
-  date_checked, comments, lat, lon, file_name
+  date_checked, comments, lat, lon
 )
 FROM (
-  SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, METADATA$FILENAME
+  SELECT
+    REGEXP_SUBSTR(METADATA$FILENAME, 'run-[0-9]+'),
+    METADATA$FILENAME,
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+    TRY_CAST($12 AS FLOAT),
+    TRY_CAST($13 AS FLOAT)
   FROM @stg_azure_raw
 )
-PATTERN = '.*data/bronze/run-0[1-4]-csv/.*\.csv'
-FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
+PATTERN = '.*data/bronze/run-0[0-9]-csv/.*[.]csv'
+FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 FORCE = TRUE
 ;
 
@@ -121,17 +127,23 @@ FORCE = TRUE
 -- CSVs at data/silver/run-XX-csv/ with same 13 columns as bronze.
 -- Silver is a subset of bronze (false positives removed by manual review).
 COPY INTO raw_silver_fsi (
+  run_id, source_file,
   city, country, name, url,
   facebook_url, twitter_url, instagram_url,
   food_sharing_activities, how_it_is_shared,
-  date_checked, comments, lat, lon, file_name
+  date_checked, comments, lat, lon
 )
 FROM (
-  SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, METADATA$FILENAME
+  SELECT
+    REGEXP_SUBSTR(METADATA$FILENAME, 'run-[0-9]+'),
+    METADATA$FILENAME,
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+    TRY_CAST($12 AS FLOAT),
+    TRY_CAST($13 AS FLOAT)
   FROM @stg_azure_raw
 )
-PATTERN = '.*data/silver/run-0[1-4]-csv/.*\.csv'
-FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
+PATTERN = '.*data/silver/run-0[0-9]-csv/.*[.]csv'
+FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 FORCE = TRUE
 ;
 

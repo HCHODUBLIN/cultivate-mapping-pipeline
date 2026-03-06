@@ -3,6 +3,8 @@
 
 with base as (
   select
+    run_id,
+    source_file,
     city,
     country,
     name,
@@ -15,12 +17,13 @@ with base as (
     date_checked,
     comments,
     lat,
-    lon,
-    file_name
+    lon
   from {{ source('cultivate', 'raw_silver_fsi') }}
 )
 
 select
+  run_id,
+  source_file,
   lower(trim(city)) as city,
   lower(trim(country)) as country,
   trim(name) as name,
@@ -66,17 +69,12 @@ select
     )
   ) as domain,
 
-  -- Derive run from file path
-  regexp_substr(file_name, 'run-0[1-4]') as run,
-
-  file_name,
-
   -- Stable row ID
   md5(
     coalesce(lower(trim(url)), '') || '|' ||
     lower(trim(city)) || '|' ||
     lower(trim(country)) || '|' ||
-    coalesce(regexp_substr(file_name, 'run-0[1-4]'), '')
+    coalesce(run_id, '')
   ) as id
 
 from base
