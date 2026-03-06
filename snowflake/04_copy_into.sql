@@ -124,22 +124,23 @@ FORCE = TRUE
 ;
 
 -- (J) raw_silver_fsi (manually verified FSIs, all runs)
--- CSVs at data/silver/run-XX-csv/ with same 13 columns as bronze.
+-- CSVs at data/silver/run-XX-csv/ with 12 columns (same as bronze minus Comments).
 -- Silver is a subset of bronze (false positives removed by manual review).
+-- Comments column kept in table but NULL for silver CSVs (only 12 columns).
 COPY INTO raw_silver_fsi (
   run_id, source_file,
   city, country, name, url,
   facebook_url, twitter_url, instagram_url,
   food_sharing_activities, how_it_is_shared,
-  date_checked, comments, lat, lon
+  date_checked, lat, lon
 )
 FROM (
   SELECT
     REGEXP_SUBSTR(METADATA$FILENAME, 'run-[0-9]+'),
     METADATA$FILENAME,
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
-    TRY_CAST($12 AS FLOAT),
-    TRY_CAST($13 AS FLOAT)
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+    TRY_CAST($11 AS FLOAT),
+    TRY_CAST($12 AS FLOAT)
   FROM @stg_azure_raw
 )
 PATTERN = '.*data/silver/run-0[0-9]-csv/.*[.]csv'
