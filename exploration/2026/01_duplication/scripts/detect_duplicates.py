@@ -13,8 +13,8 @@ _PROJECT_ROOT = str(Path(__file__).resolve().parents[4])
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from utils.io import read_csv_robust
-from utils.normalize import normalize_url
+from scripts.io import read_csv_robust
+from scripts.normalize import normalize_url
 
 sharecity_path = Path("sharecity200-export-1768225380870.csv")
 

@@ -21,7 +21,7 @@ if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
 from evaluation.f1_score import f1_score
-from utils.normalize import extract_domain, normalize_url
+from scripts.normalize import extract_domain, normalize_url
 
 sns.set_style("whitegrid")
 plt.rcParams["figure.figsize"] = (12, 8)

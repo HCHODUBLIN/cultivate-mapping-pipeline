@@ -1,3 +1,0 @@
-Classify whether the given URL represents a valid FSI in ${city}, ${country}.
-[... full criteria in paper Appendix F ...]
-Output: {"valid": bool, "confidence": float, "reason": string}

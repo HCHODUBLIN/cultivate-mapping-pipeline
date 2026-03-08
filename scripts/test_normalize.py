@@ -10,7 +10,7 @@ import math
 
 import pytest
 
-from utils.normalize import extract_domain, normalize_url
+from normalize import extract_domain, normalize_url
 
 
 # ---------------------------------------------------------------------------

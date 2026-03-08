@@ -3,9 +3,6 @@
 Azure Blob Storage Sync Script
 Sync files between local directory and Azure Blob Storage
 """
-
-from __future__ import annotations
-
 import os
 from pathlib import Path
 

@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from utils.snowflake_auth import connect, load_auth, validate_auth  # noqa: E402
+from scripts.snowflake_auth import connect, load_auth, validate_auth  # noqa: E402
 
 SNOWFLAKE_DIR = ROOT / "snowflake"
 
