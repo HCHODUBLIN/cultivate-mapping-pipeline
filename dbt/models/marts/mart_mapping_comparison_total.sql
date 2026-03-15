@@ -59,17 +59,17 @@ manual_total as (
 select
   (select n from auto_total) as total_new_links_through_automation,
   (select n from auto_valid) as total_valid_new_fsi_links,
-  (select n from auto_valid) * 1.0 / nullif((select n from auto_total),0) as valid_rate_over_all_new_links,
+  (select n from auto_valid) * 1.0 / nullif((select n from auto_total), 0) as valid_rate_over_all_new_links,
 
-  max(case when run_version='v1' then n end) as valid_new_fsi_links_v1,
-  max(case when run_version='v2' then n end) as valid_new_fsi_links_v2,
+  max(case when v.run_version = 'v1' then v.n end) as valid_new_fsi_links_v1,
+  max(case when v.run_version = 'v2' then v.n end) as valid_new_fsi_links_v2,
 
   (select n from overlap_total) as overlap_links_with_ground_truth,
-  max(case when run_version='v1' then n end) as overlap_v1,
-  max(case when run_version='v2' then n end) as overlap_v2,
+  max(case when o.run_version = 'v1' then o.n end) as overlap_v1,
+  max(case when o.run_version = 'v2' then o.n end) as overlap_v2,
 
   (select n from manual_total) as manual_links_total,
-  max(case when run_version='v1' then n end) * 1.0 / nullif((select n from manual_total),0) as manual_identified_in_v1_rate
+  max(case when o.run_version = 'v1' then o.n end) * 1.0 / nullif((select n from manual_total), 0) as manual_identified_in_v1_rate
 
-from overlap_by_version
-full join auto_valid_by_version using (run_version);
+from overlap_by_version o
+full join auto_valid_by_version v on o.run_version = v.run_version;

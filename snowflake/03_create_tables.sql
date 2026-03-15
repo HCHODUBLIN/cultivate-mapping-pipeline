@@ -1,29 +1,51 @@
 -- 03_create_tables.sql
+USE DATABASE CULTIVATE;
+USE SCHEMA HC_LOAD_DATA_FROM_CLOUD;
 
-CREATE TABLE IF NOT EXISTS raw_automation (
-  automation_id STRING,
+CREATE TABLE IF NOT EXISTS bronze_automation (
   city STRING,
-  run_id STRING,
-  source_url STRING,
+  country STRING,
+  name STRING,
+  url STRING,
+  facebook_url STRING,
+  twitter_url STRING,
+  instagram_url STRING,
+  food_sharing_activities STRING,
+  how_it_is_shared STRING,
+  date_checked STRING,
+  comments STRING,
+  lat FLOAT,
+  lon FLOAT,
   file_name STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS raw_automation_reviewed (
-  automation_id STRING,
-  is_included STRING,
+CREATE TABLE IF NOT EXISTS bronze_automation_reviewed (
+  city STRING,
+  country STRING,
+  name STRING,
+  url STRING,
+  facebook_url STRING,
+  twitter_url STRING,
+  instagram_url STRING,
+  food_sharing_activities STRING,
+  how_it_is_shared STRING,
+  date_checked STRING,
+  comments STRING,
+  lat FLOAT,
+  lon FLOAT,
   file_name STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS raw_city_language (
+CREATE TABLE IF NOT EXISTS bronze_city_language (
   city STRING,
   search_language STRING,
   file_name STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS raw_ground_truth (
+CREATE TABLE IF NOT EXISTS bronze_ground_truth (
   ground_truth_id STRING,
   city STRING,
   source_url STRING,
@@ -31,7 +53,23 @@ CREATE TABLE IF NOT EXISTS raw_ground_truth (
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS bronze_blob_inventory_raw (
+CREATE TABLE IF NOT EXISTS bronze_fsi_verified (
+  id STRING,
+  city STRING,
+  country STRING,
+  name STRING,
+  url STRING,
+  facebook_url STRING,
+  twitter_url STRING,
+  instagram_url STRING,
+  food_sharing_activities STRING,
+  how_it_is_shared STRING,
+  lat FLOAT,
+  lon FLOAT,
+  loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
+);
+
+CREATE TABLE IF NOT EXISTS bronze_blob_inventory (
   file_path STRING,
   size_bytes NUMBER,
   md5 STRING,
@@ -39,7 +77,7 @@ CREATE TABLE IF NOT EXISTS bronze_blob_inventory_raw (
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
-CREATE TABLE IF NOT EXISTS raw_sharecity200_tracker_run01 (
+CREATE TABLE IF NOT EXISTS bronze_tracker_run01 (
   region STRING,
   country STRING,
   city STRING,
@@ -61,45 +99,5 @@ CREATE TABLE IF NOT EXISTS raw_sharecity200_tracker_run01 (
   correct_name STRING,
   name_accuracy_rate STRING,
   file_name STRING,
-  loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
-);
-
-CREATE TABLE IF NOT EXISTS silver_fsi_201225 (
-  id STRING,
-  city STRING,
-  country STRING,
-  name STRING,
-  url STRING,
-  facebook_url STRING,
-  twitter_url STRING,
-  instagram_url STRING,
-  food_sharing_activities STRING,
-  how_it_is_shared STRING,
-  date_checked STRING,
-  lat FLOAT,
-  lon FLOAT,
-  round STRING,
-  growing INTEGER,
-  distribution INTEGER,
-  cooking_eating INTEGER,
-  gifting INTEGER,
-  collecting INTEGER,
-  selling INTEGER,
-  bartering INTEGER
-);
-
-CREATE TABLE IF NOT EXISTS gold_fsi_200226 (
-  country STRING,
-  city STRING,
-  name STRING,
-  url STRING,
-  instagram_url STRING,
-  twitter_url STRING,
-  facebook_url STRING,
-  food_sharing_activities STRING,
-  how_it_is_shared STRING,
-  lon FLOAT,
-  lat FLOAT,
-  comments STRING,
   loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );

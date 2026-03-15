@@ -2,7 +2,7 @@ with base as (
   select
     automation_id,
     is_included
-  from {{ source('cultivate', 'raw_automation_reviewed') }}
+  from {{ source('cultivate', 'bronze_automation_reviewed') }}
 )
 
 select

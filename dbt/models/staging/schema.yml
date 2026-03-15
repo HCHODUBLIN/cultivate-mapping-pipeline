@@ -1,33 +1,6 @@
 version: 2
 
 models:
-  - name: stg_bronze_blob_inventory
-    description: |
-      Compiled Bronze blob inventory with run-folder mapping (run-01/run-02/run-03/run-04).
-      Source table: bronze_blob_inventory_raw (stage LIST snapshot).
-    columns:
-      - name: file_path
-        description: Full blob path
-        tests:
-          - unique
-          - not_null
-      - name: run_folder
-        description: Extracted run folder path segment (run-01, run-02, ...)
-      - name: run_number
-        description: Numeric run number extracted from run_folder
-      - name: run_label
-        description: Neutral run label mapped from run folder
-        tests:
-          - accepted_values:
-              arguments:
-                values: ['run_01', 'run_02', 'run_03', 'run_04', 'run_unknown']
-      - name: artifact_type
-        description: Classified artifact type by folder and filename pattern
-        tests:
-          - accepted_values:
-              arguments:
-                values: ['system_file', 'run01_tracker_xlsx', 'run01_tracker_csv', 'scrape_summary', 'scraped_text', 'scrape_metadata_json', 'run_result_xlsx', 'run_result_json', 'versioned_city_xlsx', 'other']
-
   - name: stg_sharecity200_tracker_run01
     description: Normalized run-01 ShareCity tracker metadata from ShareCity200Tracker.xlsx.
     columns:

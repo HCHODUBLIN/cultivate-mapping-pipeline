@@ -25,10 +25,10 @@ graph LR
 ```
 
 ### Bronze Layer
-- **raw_automation**: URLs discovered by automation (5 rounds)
-- **raw_automation_reviewed**: Manual review decisions
-- **raw_ground_truth**: Manually collected URLs for validation
-- **raw_city_language**: Language mapping for multi-lingual search
+- **bronze_automation**: URLs discovered by automation (5 rounds)
+- **bronze_automation_reviewed**: Manual review decisions
+- **bronze_ground_truth**: Manually collected URLs for validation
+- **bronze_city_language**: Language mapping for multi-lingual search
 - **raw_manual_verification**: Manual verification results (105 cities, 5 rounds)
 - **gold_fsi_final_202602**: Pre-deduplication data (3,140 FSIs)
 - **gold_fsi_final**: Post-deduplication Gold data (3,052 FSIs)
@@ -59,8 +59,8 @@ graph LR
 ```mermaid
 erDiagram
     %% Bronze Layer
-    raw_automation ||--o| raw_automation_reviewed : "automation_id"
-    raw_automation {
+    bronze_automation ||--o| bronze_automation_reviewed : "automation_id"
+    bronze_automation {
         varchar automation_id PK
         varchar city
         varchar run_id
@@ -68,20 +68,20 @@ erDiagram
         timestamp loaded_at
     }
 
-    raw_automation_reviewed {
+    bronze_automation_reviewed {
         varchar automation_id PK,FK
         varchar is_included
         timestamp loaded_at
     }
 
-    raw_ground_truth {
+    bronze_ground_truth {
         varchar ground_truth_id PK
         varchar city
         varchar source_url
         timestamp loaded_at
     }
 
-    raw_city_language {
+    bronze_city_language {
         varchar city PK
         varchar search_language
         timestamp loaded_at
@@ -121,7 +121,7 @@ erDiagram
     }
 
     %% Silver Layer
-    stg_automation ||--|| raw_automation : "automation_id"
+    stg_automation ||--|| bronze_automation : "automation_id"
     stg_automation_enhanced ||--|| stg_automation : "automation_id"
     stg_automation_review ||--|| stg_automation : "automation_id"
 
@@ -142,7 +142,7 @@ erDiagram
         boolean is_included
     }
 
-    stg_ground_truth ||--|| raw_ground_truth : "ground_truth_id"
+    stg_ground_truth ||--|| bronze_ground_truth : "ground_truth_id"
     stg_ground_truth_enhanced ||--|| stg_ground_truth : "ground_truth_id"
 
     stg_ground_truth {

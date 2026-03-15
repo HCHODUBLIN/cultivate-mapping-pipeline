@@ -2,7 +2,7 @@
 -- Analysis of food sharing activities and sharing modes
 
 with fsi_data as (
-    select * from {{ ref('gold_fsi_final_rebuilt') }}
+    select * from {{ ref('int_fsi_deduplicated') }}
 ),
 
 -- Parse activities array (assuming VARIANT/JSON column)

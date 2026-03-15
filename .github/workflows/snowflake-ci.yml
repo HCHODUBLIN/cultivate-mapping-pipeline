@@ -18,7 +18,7 @@ on:
       - 'dbt/packages.yml'
 
 jobs:
-  # Job 1: SQL Lint (항상 실행)
+  # Job 1: SQL Lint (always runs)
   sql-lint:
     name: SQL Lint
     runs-on: ubuntu-latest
@@ -70,14 +70,14 @@ jobs:
             echo "::notice::Snowflake secrets missing: ${missing[*]}. Skipping dbt Snowflake Test job."
           fi
 
-  # Job 2: dbt Build & Test (Snowflake 연결)
+  # Job 2: dbt Build & Test (Snowflake connection)
   dbt-snowflake:
     name: dbt Snowflake Test
     runs-on: ubuntu-latest
     needs:
       - sql-lint
       - snowflake-secrets-guard
-    # main 브랜치 push 또는 PR label이 'run-snowflake-tests'일 때만 실행
+    # Only runs on main branch push or when PR has 'run-snowflake-tests' label
     if: (github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'run-snowflake-tests')) && needs.snowflake-secrets-guard.outputs.has_secrets == 'true'
     env:
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}

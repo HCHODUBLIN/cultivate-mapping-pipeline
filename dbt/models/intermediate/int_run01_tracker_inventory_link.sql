@@ -2,9 +2,8 @@
 -- Connect run-01 tracker with run-01 inventory and recomputed quality metrics.
 -- Metric rule:
 --   bronze_total_identified_fsi = count from Bronze(run-01) automation records
---   silver_valid_fsi = count from Silver(run-01) records
---   precision_rate_pct = silver_valid_fsi / bronze_total_identified_fsi * 100
--- Note: current Silver source has no version column; Silver is matched by city.
+--   verified_fsi = count from reviewed automation records (is_included = TRUE)
+--   precision_rate_pct = verified_fsi / bronze_total_identified_fsi * 100
 
 with tracker as (
     select
@@ -25,13 +24,13 @@ with tracker as (
 run01_inventory as (
     select
         file_path,
-        file_name,
-        artifact_type,
-        city_name as inventory_city,
-        regexp_replace(lower(coalesce(city_name, '')), '[^a-z0-9]', '') as city_key
-    from {{ ref('stg_bronze_blob_inventory') }}
-    where run_folder = 'run-01'
-      and artifact_type in ('versioned_city_xlsx', 'run_result_xlsx', 'run_result_json')
+        regexp_substr(file_path, '[^/]+$') as file_name,
+        regexp_replace(lower(coalesce(
+            regexp_substr(file_path, 'run-01/([^/]+)/', 1, 1, 'e'),
+            ''
+        )), '[^a-z0-9]', '') as city_key
+    from {{ source('cultivate', 'bronze_blob_inventory') }}
+    where file_path ilike '%run-01%'
 ),
 
 bronze_metrics as (
@@ -44,11 +43,14 @@ bronze_metrics as (
     group by 1, 2
 ),
 
-silver_metrics as (
+verified_metrics as (
     select
-        regexp_replace(lower(coalesce(city, '')), '[^a-z0-9]', '') as city_key,
-        count(*) as silver_valid_fsi
-    from {{ ref('int_fsi_powerbi_export') }}
+        regexp_replace(lower(coalesce(a.city, '')), '[^a-z0-9]', '') as city_key,
+        count(*) as verified_fsi
+    from {{ ref('stg_automation') }} a
+    inner join {{ ref('stg_automation_review') }} r
+        on a.automation_id = r.automation_id
+    where upper(r.is_included) = 'TRUE'
     group by 1
 ),
 
@@ -92,15 +94,15 @@ select
     s.run01_file_count,
     s.example_run01_file_name,
     coalesce(b.bronze_total_identified_fsi, 0) as bronze_total_identified_fsi,
-    coalesce(v.silver_valid_fsi, 0) as silver_valid_fsi,
+    coalesce(v.verified_fsi, 0) as verified_fsi,
     case
         when coalesce(b.bronze_total_identified_fsi, 0) = 0 then null
-        else round(coalesce(v.silver_valid_fsi, 0) * 100.0 / b.bronze_total_identified_fsi, 2)
+        else round(coalesce(v.verified_fsi, 0) * 100.0 / b.bronze_total_identified_fsi, 2)
     end as precision_rate_pct,
     case when s.run01_file_count > 0 then true else false end as has_run01_inventory_match
 from tracker_file_stats s
 left join bronze_metrics b
   on s.version_key = b.version_key
  and regexp_replace(lower(coalesce(s.tracker_city, '')), '[^a-z0-9]', '') = b.city_key
-left join silver_metrics v
+left join verified_metrics v
   on regexp_replace(lower(coalesce(s.tracker_city, '')), '[^a-z0-9]', '') = v.city_key

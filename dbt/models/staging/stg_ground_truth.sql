@@ -3,7 +3,7 @@ with base as (
     ground_truth_id,
     city,
     source_url
-  from {{ source('cultivate', 'raw_ground_truth') }}
+  from {{ source('cultivate', 'bronze_ground_truth') }}
 )
 
 select

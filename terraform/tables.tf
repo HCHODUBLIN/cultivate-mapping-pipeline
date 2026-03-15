@@ -1,18 +1,27 @@
 # ──────────────────────────────────────────────
-# Bronze / Raw Tables
+# Bronze Tables (CSV-ingested source data)
 # ──────────────────────────────────────────────
 
-resource "snowflake_table" "raw_automation" {
+resource "snowflake_table" "bronze_automation" {
   database = snowflake_database.cultivate.name
   schema   = snowflake_schema.raw.name
-  name     = "RAW_AUTOMATION"
-  comment  = "Automation-discovered FSI URLs"
+  name     = "BRONZE_AUTOMATION"
+  comment  = "Automation-discovered FSI records (all results before review)"
 
-  column { name = "AUTOMATION_ID" type = "STRING" }
-  column { name = "CITY"          type = "STRING" }
-  column { name = "RUN_ID"        type = "STRING" }
-  column { name = "SOURCE_URL"    type = "STRING" }
-  column { name = "FILE_NAME"     type = "STRING" }
+  column { name = "CITY"                     type = "STRING" }
+  column { name = "COUNTRY"                  type = "STRING" }
+  column { name = "NAME"                     type = "STRING" }
+  column { name = "URL"                      type = "STRING" }
+  column { name = "FACEBOOK_URL"             type = "STRING" }
+  column { name = "TWITTER_URL"              type = "STRING" }
+  column { name = "INSTAGRAM_URL"            type = "STRING" }
+  column { name = "FOOD_SHARING_ACTIVITIES"  type = "STRING" }
+  column { name = "HOW_IT_IS_SHARED"         type = "STRING" }
+  column { name = "DATE_CHECKED"             type = "STRING" }
+  column { name = "COMMENTS"                 type = "STRING" }
+  column { name = "LAT"                      type = "FLOAT" }
+  column { name = "LON"                      type = "FLOAT" }
+  column { name = "FILE_NAME"                type = "STRING" }
   column {
     name    = "LOADED_AT"
     type    = "TIMESTAMP_NTZ"
@@ -20,15 +29,26 @@ resource "snowflake_table" "raw_automation" {
   }
 }
 
-resource "snowflake_table" "raw_automation_reviewed" {
+resource "snowflake_table" "bronze_automation_reviewed" {
   database = snowflake_database.cultivate.name
   schema   = snowflake_schema.raw.name
-  name     = "RAW_AUTOMATION_REVIEWED"
-  comment  = "Manual review decisions for automation URLs"
+  name     = "BRONZE_AUTOMATION_REVIEWED"
+  comment  = "Automation FSI records after manual review (invalid rows removed)"
 
-  column { name = "AUTOMATION_ID" type = "STRING" }
-  column { name = "IS_INCLUDED"   type = "STRING" }
-  column { name = "FILE_NAME"     type = "STRING" }
+  column { name = "CITY"                     type = "STRING" }
+  column { name = "COUNTRY"                  type = "STRING" }
+  column { name = "NAME"                     type = "STRING" }
+  column { name = "URL"                      type = "STRING" }
+  column { name = "FACEBOOK_URL"             type = "STRING" }
+  column { name = "TWITTER_URL"              type = "STRING" }
+  column { name = "INSTAGRAM_URL"            type = "STRING" }
+  column { name = "FOOD_SHARING_ACTIVITIES"  type = "STRING" }
+  column { name = "HOW_IT_IS_SHARED"         type = "STRING" }
+  column { name = "DATE_CHECKED"             type = "STRING" }
+  column { name = "COMMENTS"                 type = "STRING" }
+  column { name = "LAT"                      type = "FLOAT" }
+  column { name = "LON"                      type = "FLOAT" }
+  column { name = "FILE_NAME"                type = "STRING" }
   column {
     name    = "LOADED_AT"
     type    = "TIMESTAMP_NTZ"
@@ -36,10 +56,10 @@ resource "snowflake_table" "raw_automation_reviewed" {
   }
 }
 
-resource "snowflake_table" "raw_city_language" {
+resource "snowflake_table" "bronze_city_language" {
   database = snowflake_database.cultivate.name
   schema   = snowflake_schema.raw.name
-  name     = "RAW_CITY_LANGUAGE"
+  name     = "BRONZE_CITY_LANGUAGE"
   comment  = "Language mapping per city for search automation"
 
   column { name = "CITY"             type = "STRING" }
@@ -52,10 +72,10 @@ resource "snowflake_table" "raw_city_language" {
   }
 }
 
-resource "snowflake_table" "raw_ground_truth" {
+resource "snowflake_table" "bronze_ground_truth" {
   database = snowflake_database.cultivate.name
   schema   = snowflake_schema.raw.name
-  name     = "RAW_GROUND_TRUTH"
+  name     = "BRONZE_GROUND_TRUTH"
   comment  = "Manually curated ground truth FSI URLs"
 
   column { name = "GROUND_TRUTH_ID" type = "STRING" }
@@ -69,11 +89,36 @@ resource "snowflake_table" "raw_ground_truth" {
   }
 }
 
-resource "snowflake_table" "bronze_blob_inventory_raw" {
+resource "snowflake_table" "bronze_fsi_verified" {
   database = snowflake_database.cultivate.name
   schema   = snowflake_schema.raw.name
-  name     = "BRONZE_BLOB_INVENTORY_RAW"
-  comment  = "Azure Blob file inventory snapshot"
+  name     = "BRONZE_FSI_VERIFIED"
+  comment  = "Verified FSI dataset with enriched fields (renamed from GOLD_FSI_200226)"
+
+  column { name = "ID"                       type = "STRING" }
+  column { name = "CITY"                     type = "STRING" }
+  column { name = "COUNTRY"                  type = "STRING" }
+  column { name = "NAME"                     type = "STRING" }
+  column { name = "URL"                      type = "STRING" }
+  column { name = "FACEBOOK_URL"             type = "STRING" }
+  column { name = "TWITTER_URL"              type = "STRING" }
+  column { name = "INSTAGRAM_URL"            type = "STRING" }
+  column { name = "FOOD_SHARING_ACTIVITIES"  type = "STRING" }
+  column { name = "HOW_IT_IS_SHARED"         type = "STRING" }
+  column { name = "LAT"                      type = "FLOAT" }
+  column { name = "LON"                      type = "FLOAT" }
+  column {
+    name    = "LOADED_AT"
+    type    = "TIMESTAMP_NTZ"
+    default { expression = "CURRENT_TIMESTAMP()" }
+  }
+}
+
+resource "snowflake_table" "bronze_blob_inventory" {
+  database = snowflake_database.cultivate.name
+  schema   = snowflake_schema.raw.name
+  name     = "BRONZE_BLOB_INVENTORY"
+  comment  = "Azure Blob file inventory"
 
   column { name = "FILE_PATH"      type = "STRING" }
   column { name = "SIZE_BYTES"     type = "NUMBER" }
@@ -86,10 +131,10 @@ resource "snowflake_table" "bronze_blob_inventory_raw" {
   }
 }
 
-resource "snowflake_table" "raw_sharecity200_tracker_run01" {
+resource "snowflake_table" "bronze_tracker_run01" {
   database = snowflake_database.cultivate.name
   schema   = snowflake_schema.raw.name
-  name     = "RAW_SHARECITY200_TRACKER_RUN01"
+  name     = "BRONZE_TRACKER_RUN01"
   comment  = "ShareCity200 tracker metadata for run-01 planning and QA"
 
   column { name = "REGION"                                    type = "STRING" }
@@ -113,60 +158,6 @@ resource "snowflake_table" "raw_sharecity200_tracker_run01" {
   column { name = "CORRECT_NAME"                              type = "STRING" }
   column { name = "NAME_ACCURACY_RATE"                        type = "STRING" }
   column { name = "FILE_NAME"                                 type = "STRING" }
-  column {
-    name    = "LOADED_AT"
-    type    = "TIMESTAMP_NTZ"
-    default { expression = "CURRENT_TIMESTAMP()" }
-  }
-}
-
-resource "snowflake_table" "silver_fsi_201225" {
-  database = snowflake_database.cultivate.name
-  schema   = snowflake_schema.raw.name
-  name     = "SILVER_FSI_201225"
-  comment  = "Silver snapshot — pre-deduplication FSI data (2025-12-25)"
-
-  column { name = "ID"                       type = "STRING" }
-  column { name = "CITY"                     type = "STRING" }
-  column { name = "COUNTRY"                  type = "STRING" }
-  column { name = "NAME"                     type = "STRING" }
-  column { name = "URL"                      type = "STRING" }
-  column { name = "FACEBOOK_URL"             type = "STRING" }
-  column { name = "TWITTER_URL"              type = "STRING" }
-  column { name = "INSTAGRAM_URL"            type = "STRING" }
-  column { name = "FOOD_SHARING_ACTIVITIES"  type = "STRING" }
-  column { name = "HOW_IT_IS_SHARED"         type = "STRING" }
-  column { name = "DATE_CHECKED"             type = "STRING" }
-  column { name = "LAT"                      type = "FLOAT" }
-  column { name = "LON"                      type = "FLOAT" }
-  column { name = "ROUND"                    type = "STRING" }
-  column { name = "GROWING"                  type = "INTEGER" }
-  column { name = "DISTRIBUTION"             type = "INTEGER" }
-  column { name = "COOKING_EATING"           type = "INTEGER" }
-  column { name = "GIFTING"                  type = "INTEGER" }
-  column { name = "COLLECTING"               type = "INTEGER" }
-  column { name = "SELLING"                  type = "INTEGER" }
-  column { name = "BARTERING"                type = "INTEGER" }
-}
-
-resource "snowflake_table" "gold_fsi_200226" {
-  database = snowflake_database.cultivate.name
-  schema   = snowflake_schema.raw.name
-  name     = "GOLD_FSI_200226"
-  comment  = "Gold snapshot — deduplicated FSI dataset (2026-02-26)"
-
-  column { name = "COUNTRY"                  type = "STRING" }
-  column { name = "CITY"                     type = "STRING" }
-  column { name = "NAME"                     type = "STRING" }
-  column { name = "URL"                      type = "STRING" }
-  column { name = "INSTAGRAM_URL"            type = "STRING" }
-  column { name = "TWITTER_URL"              type = "STRING" }
-  column { name = "FACEBOOK_URL"             type = "STRING" }
-  column { name = "FOOD_SHARING_ACTIVITIES"  type = "STRING" }
-  column { name = "HOW_IT_IS_SHARED"         type = "STRING" }
-  column { name = "LON"                      type = "FLOAT" }
-  column { name = "LAT"                      type = "FLOAT" }
-  column { name = "COMMENTS"                 type = "STRING" }
   column {
     name    = "LOADED_AT"
     type    = "TIMESTAMP_NTZ"

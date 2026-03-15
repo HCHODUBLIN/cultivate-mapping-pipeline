@@ -32,15 +32,13 @@ output "roles" {
 }
 
 output "table_names" {
-  description = "Bronze/raw tables managed by Terraform"
+  description = "Bronze tables managed by Terraform"
   value = [
-    snowflake_table.raw_automation.name,
-    snowflake_table.raw_automation_reviewed.name,
-    snowflake_table.raw_city_language.name,
-    snowflake_table.raw_ground_truth.name,
-    snowflake_table.bronze_blob_inventory_raw.name,
-    snowflake_table.raw_sharecity200_tracker_run01.name,
-    snowflake_table.silver_fsi_201225.name,
-    snowflake_table.gold_fsi_200226.name,
+    snowflake_table.bronze_automation.name,
+    snowflake_table.bronze_automation_reviewed.name,
+    snowflake_table.bronze_city_language.name,
+    snowflake_table.bronze_ground_truth.name,
+    snowflake_table.bronze_blob_inventory.name,
+    snowflake_table.bronze_tracker_run01.name,
   ]
 }

@@ -25,7 +25,7 @@ Project CULTIVATE_Pipeline {
 // BRONZE LAYER - Raw Data Ingestion
 // ====================================
 
-Table raw_automation {
+Table bronze_automation {
   automation_id varchar [pk, note: 'Unique identifier']
   city varchar [not null]
   run_id varchar [note: 'Automation version (v1.0.0-v2.0.0)']
@@ -36,8 +36,8 @@ Table raw_automation {
   Note: 'URLs discovered by automation across 5 rounds'
 }
 
-Table raw_automation_reviewed {
-  automation_id varchar [pk, ref: > raw_automation.automation_id]
+Table bronze_automation_reviewed {
+  automation_id varchar [pk, ref: > bronze_automation.automation_id]
   is_included varchar [not null, note: 'TRUE/FALSE as string']
   file_name varchar
   loaded_at timestamp
@@ -45,7 +45,7 @@ Table raw_automation_reviewed {
   Note: 'Manual review decisions for automation results'
 }
 
-Table raw_ground_truth {
+Table bronze_ground_truth {
   ground_truth_id varchar [pk]
   city varchar [not null]
   source_url varchar [not null]
@@ -55,7 +55,7 @@ Table raw_ground_truth {
   Note: 'Manually collected ground truth URLs for validation'
 }
 
-Table raw_city_language {
+Table bronze_city_language {
   city varchar [pk]
   search_language varchar [not null]
   file_name varchar
@@ -129,7 +129,7 @@ Table gold_fsi_final {
 // ====================================
 
 Table stg_automation {
-  automation_id varchar [pk, ref: - raw_automation.automation_id]
+  automation_id varchar [pk, ref: - bronze_automation.automation_id]
   city varchar [not null]
   run_id varchar
   source_url varchar [not null]
@@ -162,7 +162,7 @@ Table stg_automation_review {
 }
 
 Table stg_ground_truth {
-  ground_truth_id varchar [pk, ref: - raw_ground_truth.ground_truth_id]
+  ground_truth_id varchar [pk, ref: - bronze_ground_truth.ground_truth_id]
   city varchar [not null]
   source_url varchar [not null]
   file_name varchar

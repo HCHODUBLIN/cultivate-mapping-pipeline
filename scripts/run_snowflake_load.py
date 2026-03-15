@@ -81,14 +81,12 @@ def main() -> int:
 
             print("\n[row counts]")
             tables = [
-                "raw_ground_truth",
-                "raw_automation",
-                "raw_automation_reviewed",
-                "raw_city_language",
-                "raw_sharecity200_tracker_run01",
-                "bronze_blob_inventory_raw",
-                "silver_fsi_201225",
-                "gold_fsi_200226",
+                "bronze_ground_truth",
+                "bronze_automation",
+                "bronze_automation_reviewed",
+                "bronze_city_language",
+                "bronze_tracker_run01",
+                "bronze_blob_inventory",
             ]
             for table in tables:
                 cur.execute(f"select count(*) from identifier('{table}')")

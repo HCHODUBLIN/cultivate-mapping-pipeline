@@ -35,10 +35,10 @@ flowchart LR
 
 ### Rebuilt Medallion Lineage (current)
 
-- Bronze source snapshot: `CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.SILVER_FSI_201225`
-- Silver normalization: `dbt/models/staging/stg_fsi_powerbi_export.sql`
-- Gold reconstruction: `dbt/models/marts/gold_fsi_final_rebuilt.sql` (deterministic dedup)
-- Downstream marts: models in `dbt/models/marts/` reading from `ref('gold_fsi_final_rebuilt')`
+- Bronze sources: `CULTIVATE.HC_LOAD_DATA_FROM_CLOUD.BRONZE_*` (7 tables)
+- Staging: `dbt/models/staging/stg_*.sql` (cleaned/typed views)
+- Intermediate: `dbt/models/intermediate/int_*.sql` (business logic + dedup)
+- Marts: `dbt/models/marts/` (business-ready aggregations reading from `ref('int_fsi_deduplicated')`)
 
 ## Quick Start
 

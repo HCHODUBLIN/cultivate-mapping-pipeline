@@ -50,4 +50,4 @@ cp 02_stages.sql.template 02_stages.sql
 - `04_copy_into.sql` uses explicit Azure folder paths (`data/exploration_data/...`, `data/gold/prod/...`).
 - Tracker ingestion is included in step 4 as `COPY INTO raw_sharecity200_tracker_run01`.
 - `ShareCity200Tracker.xlsx` cannot be loaded directly with `COPY INTO`; convert it to `data/bronze/run-01/ShareCity200Tracker.csv` first.
-- `04_copy_into.sql` also snapshots Azure Bronze file inventory into `bronze_blob_inventory_raw`.
+- `04_copy_into.sql` also snapshots Azure Bronze file inventory into `bronze_blob_inventory`.

@@ -2,7 +2,7 @@ with base as (
   select
     city,
     search_language
-  from {{ source('cultivate', 'raw_city_language') }}
+  from {{ source('cultivate', 'bronze_city_language') }}
 )
 
 select

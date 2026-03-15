@@ -21,12 +21,12 @@ This runbook covers the SQL flow in `snowflake/`:
 1. Azure ingestion must be managed in `snowflake/` SQL files.
 2. `COPY INTO` paths must use explicit Azure subpaths (no ambiguous stage-root assumptions).
 3. The tracker dataset is part of standard ingestion:
-   `RAW_SHARECITY200_TRACKER_RUN01`.
+   `BRONZE_TRACKER_RUN01`.
 4. `.xlsx` files are not ingested directly by Snowflake `COPY INTO`.
    Convert tracker to CSV first:
    `data/bronze/run-01/ShareCity200Tracker.csv`.
 5. Bronze blob inventory must be snapshotted into
-   `BRONZE_BLOB_INVENTORY_RAW` via `LIST @stg_azure_raw` + `RESULT_SCAN`.
+   `BRONZE_BLOB_INVENTORY` via `LIST @stg_azure_raw` + `RESULT_SCAN`.
    Use saved query id + positional columns (`$1..$4`) to avoid
    identifier-case errors in result-scan metadata.
 
@@ -47,21 +47,19 @@ If Azure folder structure changes, update `04_copy_into.sql` first.
 
 Created by `snowflake/03_create_tables.sql`:
 
-- `RAW_AUTOMATION`
-- `RAW_AUTOMATION_REVIEWED`
-- `RAW_CITY_LANGUAGE`
-- `RAW_GROUND_TRUTH`
-- `RAW_SHARECITY200_TRACKER_RUN01`
-- `BRONZE_BLOB_INVENTORY_RAW`
-- `SILVER_FSI_201225`
-- `GOLD_FSI_200226`
+- `BRONZE_AUTOMATION`
+- `BRONZE_AUTOMATION_REVIEWED`
+- `BRONZE_CITY_LANGUAGE`
+- `BRONZE_GROUND_TRUTH`
+- `BRONZE_TRACKER_RUN01`
+- `BRONZE_BLOB_INVENTORY`
 
 ## dbt Dependency Notes
 
 dbt source definitions depend on these tables:
 
-- `BRONZE_BLOB_INVENTORY_RAW` -> `stg_bronze_blob_inventory`
-- `RAW_SHARECITY200_TRACKER_RUN01` -> `stg_sharecity200_tracker_run01`
+- `BRONZE_BLOB_INVENTORY` -> `stg_bronze_blob_inventory`
+- `BRONZE_TRACKER_RUN01` -> `stg_sharecity200_tracker_run01`
 
 If table names or schemas change in Snowflake SQL, update:
 

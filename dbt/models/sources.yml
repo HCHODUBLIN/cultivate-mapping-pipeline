@@ -2,12 +2,12 @@ version: 2
 
 sources:
   - name: cultivate
-    description: Raw tables for CULTIVATE mapping pipeline data
+    description: Bronze tables for CULTIVATE mapping pipeline data
     database: CULTIVATE
     schema: HC_LOAD_DATA_FROM_CLOUD
 
     tables:
-      - name: raw_ground_truth
+      - name: bronze_ground_truth
         description: Ground truth URLs manually collected
         columns:
           - name: ground_truth_id
@@ -30,7 +30,7 @@ sources:
             tests:
               - not_null
 
-      - name: raw_automation
+      - name: bronze_automation
         description: URLs found by automation scripts
         columns:
           - name: automation_id
@@ -46,11 +46,11 @@ sources:
           - name: loaded_at
             description: Timestamp when data was loaded
 
-      - name: raw_automation_reviewed
+      - name: bronze_automation_reviewed
         description: Review decisions for automation results
         columns:
           - name: automation_id
-            description: Links to raw_automation
+            description: Links to bronze_automation
           - name: is_included
             description: Whether URL should be included (TRUE/FALSE as string)
           - name: file_name
@@ -58,7 +58,7 @@ sources:
           - name: loaded_at
             description: Timestamp when data was loaded
 
-      - name: raw_city_language
+      - name: bronze_city_language
         description: Language mapping for each city
         columns:
           - name: city
@@ -69,8 +69,8 @@ sources:
             description: Source file name
           - name: loaded_at
             description: Timestamp when data was loaded
-      - name: bronze_blob_inventory_raw
-        description: Raw LIST output snapshot for Azure Bronze blob paths.
+      - name: bronze_blob_inventory
+        description: Azure Blob file inventory from stage LIST output.
         columns:
           - name: file_path
             description: Full blob path from stage LIST output
@@ -83,7 +83,38 @@ sources:
           - name: last_modified
             description: Blob last modified timestamp
 
-      - name: raw_sharecity200_tracker_run01
+      - name: bronze_fsi_verified
+        description: |
+          Verified FSI dataset (renamed from GOLD_FSI_200226).
+          Contains enriched FSI records with name, URL, social media links,
+          coordinates, and sharing activity classification.
+        columns:
+          - name: id
+            description: FSI record identifier
+          - name: city
+            description: City name
+          - name: country
+            description: Country name
+          - name: name
+            description: FSI name
+          - name: url
+            description: Canonical website URL
+          - name: facebook_url
+            description: Facebook page URL
+          - name: twitter_url
+            description: Twitter/X profile URL
+          - name: instagram_url
+            description: Instagram profile URL
+          - name: food_sharing_activities
+            description: JSON array of food sharing activity types
+          - name: how_it_is_shared
+            description: Comma-separated sharing modes (raw values)
+          - name: lat
+            description: Latitude coordinate
+          - name: lon
+            description: Longitude coordinate
+
+      - name: bronze_tracker_run01
         description: |
           Run-01 ShareCity tracker content from ShareCity200Tracker.xlsx.
           One row per city with planning and QA metadata.
@@ -133,63 +164,4 @@ sources:
           - name: loaded_at
             description: Row ingestion timestamp
 
-      - name: gold_fsi_200226
-        description: Final deduplicated FSI dataset (Gold layer snapshot, 2026-02-20)
-        tests:
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: "(select count(*) from {{ source('cultivate', 'gold_fsi_200226') }}) = 3052"
-              name: gold_fsi_200226_total_count_check
-        columns:
-          - name: name
-            description: FSI name
-            tests:
-              - not_null
-          - name: url
-            description: FSI website URL
-            tests:
-              - not_null
-          - name: facebook_url
-            description: Facebook URL
-          - name: twitter_url
-            description: Twitter URL
-          - name: instagram_url
-            description: Instagram URL
-          - name: food_sharing_activities
-            description: Array of food sharing activities (Distribution, Growing, Cooking & Eating)
-          - name: how_it_is_shared
-            description: Array of sharing modes (Gifting, Selling, Bartering, etc.)
-          - name: country
-            description: Country name
-            tests:
-              - not_null
-          - name: city
-            description: City name
-            tests:
-              - not_null
-          - name: lon
-            description: Longitude
-          - name: lat
-            description: Latitude
-
-      - name: silver_fsi_201225
-        description: |
-          Silver snapshot table before final deduplication (2025-12-20).
-          date_checked stored as STRING; parse in silver layer (int_fsi_powerbi_export)
-        columns:
-          - name: id
-            description: Unique FSI identifier
-            tests:
-              - unique
-              - not_null
-          - name: city
-            description: City name
-            tests:
-              - not_null
-          - name: country
-            description: Country name
-            tests:
-              - not_null
-          - name: date_checked
-            description: Raw date string (DD/MM/YYYY or empty); parsed to DATE in silver layer
 

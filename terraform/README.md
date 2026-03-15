@@ -11,7 +11,7 @@ Infrastructure-as-Code for the CULTIVATE food-sharing mapping pipeline on Snowfl
 | **Schemas** | `HC_LOAD_DATA_FROM_CLOUD` (raw), `STAGING`, `INTERMEDIATE`, `MARTS` |
 | **File Formats** | JSON (strip array), CSV default, CSV UTF-8 |
 | **External Stage** | Azure Blob Storage (optional) |
-| **Tables** | 8 Bronze/raw tables |
+| **Tables** | 6 Bronze tables (`BRONZE_*`) |
 | **Roles & Grants** | `CULTIVATE_TRANSFORMER`, `CULTIVATE_READER`, `CULTIVATE_LOADER` |
 
 ## Architecture

@@ -5,11 +5,10 @@
 with pre_dedup as (
     select
         city,
-        country,
         count(*) as fsi_count_before,
-        count(distinct coalesce(id, url)) as unique_urls_before
-    from {{ source('cultivate', 'silver_fsi_201225') }}
-    group by city, country
+        count(distinct source_url) as unique_urls_before
+    from {{ ref('stg_automation') }}
+    group by city
 ),
 
 post_dedup as (
@@ -18,14 +17,14 @@ post_dedup as (
         country,
         count(*) as fsi_count_after,
         count(distinct url) as unique_urls_after
-    from {{ ref('gold_fsi_final_rebuilt') }}
+    from {{ ref('int_fsi_deduplicated') }}
     group by city, country
 ),
 
 comparison as (
     select
         coalesce(pre.city, post.city) as city,
-        coalesce(pre.country, post.country) as country,
+        post.country,
         coalesce(pre.fsi_count_before, 0) as fsi_count_before,
         coalesce(post.fsi_count_after, 0) as fsi_count_after,
         coalesce(pre.fsi_count_before, 0) - coalesce(post.fsi_count_after, 0) as duplicates_removed,
@@ -44,7 +43,6 @@ comparison as (
     from pre_dedup pre
     full outer join post_dedup post
         on pre.city = post.city
-        and pre.country = post.country
 ),
 
 -- Add summary stats

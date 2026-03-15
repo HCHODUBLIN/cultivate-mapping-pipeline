@@ -25,7 +25,7 @@ with src as (
         name_accuracy_rate,
         file_name,
         loaded_at
-    from {{ source('cultivate', 'raw_sharecity200_tracker_run01') }}
+    from {{ source('cultivate', 'bronze_tracker_run01') }}
 )
 
 select

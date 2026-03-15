@@ -1,8 +1,8 @@
 -- models/intermediate/int_how_shared_standardized.sql
--- Standardize HOW_IT_IS_SHARED values in the Gold snapshot using seed-driven lookup.
+-- Standardize HOW_IT_IS_SHARED values in Bronze data using seed-driven lookup.
 -- Splits multi-value field, maps each value via how_shared_mapping seed,
 -- then re-aggregates into a clean comma-separated string.
--- Source: gold_fsi_200226 (3,052 rows, already deduplicated)
+-- Source: bronze_fsi_verified (renamed from GOLD_FSI_200226)
 
 with base as (
     select
@@ -23,7 +23,7 @@ with base as (
         how_it_is_shared,
         lat,
         lon
-    from {{ source('cultivate', 'gold_fsi_200226') }}
+    from {{ source('cultivate', 'bronze_fsi_verified') }}
 ),
 
 -- Explode comma-separated how_it_is_shared into individual rows.

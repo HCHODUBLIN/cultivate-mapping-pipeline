@@ -2,7 +2,7 @@
 -- City-level FSI statistics for 105 cities landscape analysis
 
 with fsi_data as (
-    select * from {{ ref('gold_fsi_final_rebuilt') }}
+    select * from {{ ref('int_fsi_deduplicated') }}
 ),
 
 city_counts as (

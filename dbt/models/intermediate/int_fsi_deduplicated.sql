@@ -1,7 +1,8 @@
--- models/marts/gold_fsi_final_rebuilt.sql
--- Standardized Gold dataset from gold_fsi_200226 snapshot via seed-driven cleanup + dedup.
+-- models/intermediate/int_fsi_deduplicated.sql
+-- Deterministic URL-level deduplication of FSI records.
+-- Keeps the most complete record per (city + URL) or (city + name + country).
 
-with gold_base as (
+with base as (
     select
         id,
         city,
@@ -33,7 +34,7 @@ normalized as (
             iff(nullif(trim(instagram_url), '') is null, 0, 1) +
             iff(lat is null or lon is null, 0, 1)
         ) as completeness_score
-    from gold_base
+    from base
 ),
 
 ranked as (

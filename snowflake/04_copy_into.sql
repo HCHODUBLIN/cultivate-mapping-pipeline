@@ -3,10 +3,10 @@
 -- Stage root is expected to be:
 -- azure://<account>.blob.core.windows.net/cultivate/
 
--- (A) raw_automation (legacy 2024)
-COPY INTO raw_automation (automation_id, city, run_id, source_url, file_name)
+COPY INTO bronze_automation (city, country, name, url, facebook_url, twitter_url, instagram_url, food_sharing_activities, how_it_is_shared, date_checked, comments, lat, lon, file_name)
 FROM (
-  SELECT $1, $2, $3, $4, METADATA$FILENAME
+  SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+         TRY_CAST($12 AS FLOAT), TRY_CAST($13 AS FLOAT), METADATA$FILENAME
   FROM @stg_azure_raw
 )
 FILES = ('data/exploration_data/legacy_2024_data/automation.csv')
@@ -14,10 +14,11 @@ FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 FORCE = TRUE
 ;
 
--- (B) raw_automation_reviewed (legacy 2024)
-COPY INTO raw_automation_reviewed (automation_id, is_included, file_name)
+-- (B) bronze_automation_reviewed (same structure, invalid rows removed)
+COPY INTO bronze_automation_reviewed (city, country, name, url, facebook_url, twitter_url, instagram_url, food_sharing_activities, how_it_is_shared, date_checked, comments, lat, lon, file_name)
 FROM (
-  SELECT $1, $2, METADATA$FILENAME
+  SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+         TRY_CAST($12 AS FLOAT), TRY_CAST($13 AS FLOAT), METADATA$FILENAME
   FROM @stg_azure_raw
 )
 FILES = ('data/exploration_data/legacy_2024_data/automation_reviewed.csv')
@@ -25,8 +26,8 @@ FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 FORCE = TRUE
 ;
 
--- (C) raw_city_language (legacy 2024)
-COPY INTO raw_city_language (city, search_language, file_name)
+-- (C) bronze_city_language (legacy 2024)
+COPY INTO bronze_city_language (city, search_language, file_name)
 FROM (
   SELECT $1, $2, METADATA$FILENAME
   FROM @stg_azure_raw
@@ -36,8 +37,8 @@ FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 FORCE = TRUE
 ;
 
--- (D) raw_ground_truth (legacy 2024)
-COPY INTO raw_ground_truth (ground_truth_id, city, source_url, file_name)
+-- (D) bronze_ground_truth (legacy 2024)
+COPY INTO bronze_ground_truth (ground_truth_id, city, source_url, file_name)
 FROM (
   SELECT $1, $2, $3, METADATA$FILENAME
   FROM @stg_azure_raw
@@ -47,38 +48,11 @@ FILE_FORMAT = (FORMAT_NAME = ff_csv_default)
 FORCE = TRUE
 ;
 
--- (E) gold snapshot load (current production export 2026-02-17)
-COPY INTO gold_fsi_200226 (
-  country, city, name, url, instagram_url, twitter_url,
-  facebook_url, food_sharing_activities, how_it_is_shared, lon, lat, comments
-)
-FROM (
-  SELECT
-    $8, $9, $1, $2, $5, $4,
-    $3, $6, $7, $10, $11, $12
-  FROM @stg_azure_raw
-)
-FILES = ('data/gold/prod/2026-02-17/sharecity200-export-1771342197988.csv')
-FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
-FORCE = TRUE
-;
-
--- (F) silver snapshot load (pre-dedup export, optional)
--- Uncomment if you want to rebuild silver source from 2025-12-05 export.
-/*
-COPY INTO silver_fsi_201225
-FROM @stg_azure_raw
-FILES = ('data/gold/prod/2025-12-05/sharecity200-export-1764933656343.csv')
-FILE_FORMAT = (FORMAT_NAME = ff_csv_utf8)
-FORCE = TRUE
-;
-*/
-
--- (G) run-01 tracker load (CSV required)
+-- (E) run-01 tracker load (CSV required)
 -- Snowflake COPY INTO cannot ingest .xlsx directly.
 -- Convert ShareCity200Tracker.xlsx -> ShareCity200Tracker.csv and upload to:
 -- data/bronze/run-01/ShareCity200Tracker.csv
-COPY INTO raw_sharecity200_tracker_run01 (
+COPY INTO bronze_tracker_run01 (
   region, country, city, language, sharecity_tier, hub_or_spoke, priority,
   dcu_fsi_search_plan_week_commencing, tcd_manual_check_plan_week_commencing,
   data_entry_size_before_manual_checking, manual_review_checker_assigned,
@@ -99,12 +73,12 @@ FORCE = TRUE
 ;
 
 -- (K) bronze blob inventory snapshot (for dbt stg_bronze_blob_inventory source)
-TRUNCATE TABLE bronze_blob_inventory_raw;
+TRUNCATE TABLE bronze_blob_inventory;
 
 LIST @stg_azure_raw PATTERN = '.*data/bronze/.*';
 SET BRONZE_LIST_QID = (SELECT LAST_QUERY_ID());
 
-INSERT INTO bronze_blob_inventory_raw (file_path, size_bytes, md5, last_modified)
+INSERT INTO bronze_blob_inventory (file_path, size_bytes, md5, last_modified)
 SELECT
   $1::STRING AS file_path,
   $2::NUMBER AS size_bytes,

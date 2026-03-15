@@ -4,7 +4,7 @@ with base as (
     city,
     run_id,
     source_url
-  from {{ source('cultivate', 'raw_automation') }}
+  from {{ source('cultivate', 'bronze_automation') }}
 )
 
 select
