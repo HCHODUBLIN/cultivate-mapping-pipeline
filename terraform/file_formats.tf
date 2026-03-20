@@ -22,16 +22,3 @@ resource "snowflake_file_format" "csv_default" {
   field_optionally_enclosed_by  = "\""
   null_if                       = ["", "NULL"]
 }
-
-resource "snowflake_file_format" "csv_utf8" {
-  database = snowflake_database.cultivate.name
-  schema   = snowflake_schema.raw.name
-  name     = "FF_CSV_UTF8"
-
-  format_type                   = "CSV"
-  field_delimiter               = ","
-  skip_header                   = 1
-  field_optionally_enclosed_by  = "\""
-  null_if                       = ["", "NULL"]
-  encoding                      = "UTF8"
-}

@@ -10,30 +10,26 @@ resource "snowflake_database" "cultivate" {
 # Schemas
 # ──────────────────────────────────────────────
 
-# Raw / Bronze data loading schema
 resource "snowflake_schema" "raw" {
   database = snowflake_database.cultivate.name
   name     = var.raw_schema_name
-  comment  = "Bronze layer — raw data loaded from Azure Blob and manual sources"
+  comment = "Source data loaded from AWS S3 and manual sources — no transformation"
 }
 
-# dbt staging layer (views)
 resource "snowflake_schema" "staging" {
   database = snowflake_database.cultivate.name
-  name     = "STAGING"
-  comment  = "dbt staging layer — cleaned and typed source views"
+  name     = var.staging_schema_name
+  comment = "1:1 cleaned source models — cast, rename, dedup (stg_)"
 }
 
-# dbt intermediate layer (views)
 resource "snowflake_schema" "intermediate" {
   database = snowflake_database.cultivate.name
-  name     = "INTERMEDIATE"
-  comment  = "dbt intermediate layer — business logic transformations"
-}
+  name     = var.intermediate_schema_name
+  comment = "Joined and enriched models — business logic applied (int_)"
+} 
 
-# dbt marts / gold layer (tables)
 resource "snowflake_schema" "marts" {
   database = snowflake_database.cultivate.name
-  name     = "MARTS"
-  comment  = "dbt marts layer — production-ready tables for BI and analytics"
+  name     = var.marts_schema_name
+  comment = "Business-ready entities for BI and analytics (fct_, dim_)"
 }

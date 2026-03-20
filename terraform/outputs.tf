@@ -15,30 +15,16 @@ output "warehouse_name" {
 output "schemas" {
   description = "Map of schema names created"
   value = {
-    raw          = snowflake_schema.raw.name
-    staging      = snowflake_schema.staging.name
-    intermediate = snowflake_schema.intermediate.name
-    marts        = snowflake_schema.marts.name
+    raw = snowflake_schema.raw.name
   }
 }
 
 output "roles" {
   description = "Custom roles created for RBAC"
   value = {
-    transformer = snowflake_role.transformer.name
-    reader      = snowflake_role.reader.name
-    loader      = snowflake_role.loader.name
+    transformer = snowflake_account_role.transformer.name
+    reader      = snowflake_account_role.reader.name
+    loader      = snowflake_account_role.loader.name
   }
 }
 
-output "table_names" {
-  description = "Bronze tables managed by Terraform"
-  value = [
-    snowflake_table.bronze_automation.name,
-    snowflake_table.bronze_automation_reviewed.name,
-    snowflake_table.bronze_city_language.name,
-    snowflake_table.bronze_ground_truth.name,
-    snowflake_table.bronze_blob_inventory.name,
-    snowflake_table.bronze_tracker_run01.name,
-  ]
-}

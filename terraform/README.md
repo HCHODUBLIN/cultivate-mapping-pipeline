@@ -9,9 +9,8 @@ Infrastructure-as-Code for the CULTIVATE food-sharing mapping pipeline on Snowfl
 | **Warehouse** | `FSI_WH` — X-Small, auto-suspend 60s |
 | **Database** | `CULTIVATE` |
 | **Schemas** | `HC_LOAD_DATA_FROM_CLOUD` (raw), `STAGING`, `INTERMEDIATE`, `MARTS` |
-| **File Formats** | JSON (strip array), CSV default, CSV UTF-8 |
-| **External Stage** | Azure Blob Storage (optional) |
-| **Tables** | 6 Bronze tables (`BRONZE_*`) |
+| **File Formats** | JSON (strip array), CSV default |
+| **External Stage** | AWS S3 (optional) |
 | **Roles & Grants** | `CULTIVATE_TRANSFORMER`, `CULTIVATE_READER`, `CULTIVATE_LOADER` |
 
 ## Architecture
@@ -41,30 +40,19 @@ terraform plan
 terraform apply
 ```
 
-## Multi-Environment
+## Files (dependency order)
 
-```bash
-# Dev (default)
-terraform apply -var="environment=dev"
-
-# Production
-terraform apply -var="environment=prod" -var="warehouse_size=SMALL"
-```
-
-## Files
-
-| File | Purpose |
-|------|---------|
-| `provider.tf` | Snowflake provider configuration |
-| `versions.tf` | Terraform and provider version constraints |
-| `variables.tf` | Input variables with defaults and validation |
-| `database.tf` | Database and schema definitions |
-| `warehouse.tf` | Warehouse configuration |
-| `file_formats.tf` | File format definitions for data loading |
-| `stages.tf` | External stage for Azure Blob (conditional) |
-| `tables.tf` | Bronze/raw layer table definitions |
-| `roles.tf` | RBAC roles, hierarchy, and privilege grants |
-| `outputs.tf` | Output values for reference |
+| # | File | Purpose |
+|---|------|---------|
+| 1 | `versions.tf` | Terraform and provider version constraints |
+| 2 | `variables.tf` | Input variables with defaults and validation |
+| 3 | `provider.tf` | Snowflake provider connection (uses variables) |
+| 4 | `database.tf` | Database and schema definitions |
+| 5 | `warehouse.tf` | Warehouse configuration |
+| 6 | `roles.tf` | RBAC roles, hierarchy, and privilege grants |
+| 7 | `file_formats.tf` | File format definitions for data loading |
+| 8 | `stages.tf` | External stage — AWS S3 (depends on database, schema, file format) |
+| 9 | `outputs.tf` | Output values for reference |
 
 ## CI/CD Integration
 
@@ -83,7 +71,7 @@ merge to main ──────────────────────
 | **Plan** | All PRs | `terraform plan` — posts infrastructure diff as PR comment |
 | **Apply** | Merge to main | `terraform apply` — provisions changes (requires `production` environment approval) |
 
-**Required GitHub Secrets:** `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_ROLE` (shared with dbt CI)
+**Required GitHub Secrets:** `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_ROLE` (shared with dbt CI), plus `AWS_IAM_ROLE_ARN` and `AWS_S3_BUCKET` if using the S3 external stage
 
 ### Full Pipeline Flow
 
