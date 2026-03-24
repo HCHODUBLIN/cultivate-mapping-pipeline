@@ -79,7 +79,3 @@ python scripts/run_evaluation.py
 ## Stack
 
 Snowflake | dbt | Python | Azure (Data Factory, SQL) | LLM/OpenAI API | GitHub Actions
-
-## GitHub
-
-- [github.com/HCHODUBLIN/CULTIVATE](https://github.com/HCHODUBLIN/CULTIVATE)
