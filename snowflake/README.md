@@ -7,15 +7,19 @@ Internal logic reference:
 
 ## Execution order
 
-| Order | File | Description |
-|-------|------|-------------|
-| 0 | `00_context.sql` | Session context setup (role, warehouse, database, schema) |
-| 1 | `01_file_formats.sql` | File format creation (JSON, CSV) |
-| 2 | `02_stages.sql` | External stage creation (Azure Blob Storage connection) |
-| 3 | `03_create_tables.sql` | Table creation |
-| 4 | `04_copy_into.sql` | Data loading (COPY INTO) |
-| 5 | `05_dedup.sql` | Duplicate check views |
-| 6 | `06_validation.sql` | Data validation queries |
+> **Note:** Scripts 00–03 are now managed by Terraform (`terraform/`).
+> They are kept here as a reference for the original SQL definitions,
+> but `terraform apply` is the source of truth for provisioning these objects.
+
+| Order | File | Description | Managed by |
+|-------|------|-------------|------------|
+| 0 | `00_context.sql` | Session context setup (role, warehouse, database, schema) | Terraform |
+| 1 | `01_file_formats.sql` | File format creation (JSON, CSV) | Terraform |
+| 2 | `02_stages.sql` | External stage creation (Azure Blob Storage connection) | Terraform |
+| 3 | `03_create_tables.sql` | Table creation | Terraform |
+| 4 | `04_copy_into.sql` | Data loading (COPY INTO) | SQL (operational) |
+| 5 | `05_dedup.sql` | Duplicate check views | SQL (operational) |
+| 6 | `06_validation.sql` | Data validation queries | SQL (operational) |
 
 ## Template setup
 
