@@ -2,12 +2,10 @@ cultivate:
   target: dev
   outputs:
     dev:
-      type: snowflake
-      account: <YOUR_ACCOUNT_IDENTIFIER>  # e.g., YWQBLJD-ON96190
-      user: <YOUR_USERNAME>
-      password: <YOUR_PASSWORD>
-      role: ACCOUNTADMIN
-      database: CULTIVATE
-      warehouse: FSI_WH
-      schema: HC_LOAD_DATA_FROM_CLOUD
+      type: duckdb
+      path: cultivate.duckdb
+      extensions:
+        - httpfs
+      settings:
+        s3_region: eu-north-1
       threads: 4

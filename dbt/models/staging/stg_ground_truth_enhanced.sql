@@ -16,7 +16,7 @@ select
   -- Path segments extraction
   -- First path segment (e.g., facebook.com/groups/abc -> "groups")
   lower(
-    regexp_substr(
+    regexp_extract(
       regexp_replace(
         source_url_norm,
         '^[^/]+/',  -- Remove domain and first slash
@@ -28,7 +28,7 @@ select
 
   -- Second path segment (e.g., facebook.com/groups/abc -> "abc")
   lower(
-    regexp_substr(
+    regexp_extract(
       regexp_replace(
         regexp_replace(
           source_url_norm,
@@ -45,18 +45,16 @@ select
   -- Combined: domain + first path segment
   -- Useful for matching facebook.com/groups/* separately from facebook.com/events/*
   case
-    when regexp_substr(regexp_replace(source_url_norm, '^[^/]+/', ''), '^[^/?#]+') is not null
-    then domain || '/' || lower(regexp_substr(regexp_replace(source_url_norm, '^[^/]+/', ''), '^[^/?#]+'))
+    when regexp_extract(regexp_replace(source_url_norm, '^[^/]+/', ''), '^[^/?#]+') is not null
+    then domain || '/' || lower(regexp_extract(regexp_replace(source_url_norm, '^[^/]+/', ''), '^[^/?#]+'))
     else domain
   end as domain_path1,
 
   -- URL depth (number of path segments)
   -- Helps identify if it's a simple domain vs deep page
-  array_size(
-    split(
-      regexp_replace(source_url_norm, '^[^/]+/', ''),  -- Remove domain
-      '/'
-    )
-  ) as url_depth
+  len(string_split(
+    regexp_replace(source_url_norm, '^[^/]+/', ''),  -- Remove domain
+    '/'
+  )) as url_depth
 
 from base

@@ -52,6 +52,6 @@ select
   ) as domain,
 
   -- Extract version from run_id
-  regexp_substr(run_id, 'v[0-9]+$') as version
+  regexp_extract(run_id, 'v[0-9]+$') as version
 
 from base

@@ -24,9 +24,9 @@ with tracker as (
 run01_inventory as (
     select
         file_path,
-        regexp_substr(file_path, '[^/]+$') as file_name,
+        regexp_extract(file_path, '[^/]+$') as file_name,
         regexp_replace(lower(coalesce(
-            regexp_substr(file_path, 'run-01/([^/]+)/', 1, 1, 'e'),
+            regexp_extract(file_path, 'run-01/([^/]+)/', 1),
             ''
         )), '[^a-z0-9]', '') as city_key
     from {{ source('cultivate', 'bronze_blob_inventory') }}
@@ -36,7 +36,7 @@ run01_inventory as (
 bronze_metrics as (
     select
         regexp_replace(lower(coalesce(city, '')), '[^a-z0-9]', '') as city_key,
-        lower(regexp_replace(coalesce(regexp_substr(run_id, 'v[0-9]+(\\.[0-9]+){0,2}', 1, 1, 'i'), ''), '^v', '')) as version_key,
+        lower(regexp_replace(coalesce(regexp_extract(run_id, 'v[0-9]+(\.[0-9]+){0,2}'), ''), '^v', '')) as version_key,
         count(*) as bronze_total_identified_fsi
     from {{ ref('stg_automation') }}
     where run_id is not null

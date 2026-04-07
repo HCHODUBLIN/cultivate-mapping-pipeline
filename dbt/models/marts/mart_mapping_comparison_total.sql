@@ -1,7 +1,7 @@
 with auto as (
   select
     lower(city) as city,
-    regexp_substr(run_id, 'v[0-9]+$') as run_version,
+    regexp_extract(run_id, 'v[0-9]+$') as run_version,
     source_url,
     coalesce(r.is_included, false) as is_included
   from {{ ref('stg_automation') }} a
