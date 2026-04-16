@@ -5,6 +5,35 @@ Architecture overview → [ARCHITECTURE.md](ARCHITECTURE.md) | Data model → [s
 
 ---
 
+## Documentation index
+
+### Top-level
+- [ARCHITECTURE.md](ARCHITECTURE.md) — system architecture, components, data flow
+- [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) — rationale behind major technical choices
+- [OPERATIONAL_SCALE.md](OPERATIONAL_SCALE.md) — production scale and throughput
+
+### Component READMEs
+- [terraform/](terraform/README.md) — AWS S3 infrastructure as code
+- [dbt/](dbt/README.md) — dbt project overview
+- [dbt/models/](dbt/models/README.md) — model layer documentation
+- [dbt/tests/](dbt/tests/README.md) — data quality tests
+- [scripts/](scripts/README.md) — Python utilities and SHARECITY 100 pipeline
+- [snowflake/](snowflake/README.md) — legacy Snowflake SQL (pre-DuckDB migration)
+- [exploration/](exploration/README.md) — prompt engineering and A/B testing
+- [exploration/2024/](exploration/2024/README.md) — early-phase exploration
+- [evaluation/](evaluation/README.md) — F1, precision/recall tracking
+
+### Schema & governance
+- [schema/data_model.md](schema/data_model.md) — conceptual + physical data model
+- [schema/ERD.md](schema/ERD.md) — entity relationship diagram
+- [governance/contribution_log.md](governance/contribution_log.md) — contributors and roles
+- [governance/security_redaction.md](governance/security_redaction.md) — what was redacted for the public version
+
+### Internal runbooks
+- [docs/internal_snowflake_ingestion_runbook.md](docs/internal_snowflake_ingestion_runbook.md) — legacy Snowflake ingestion
+
+---
+
 ## Architecture Overview
 
 ```mermaid
