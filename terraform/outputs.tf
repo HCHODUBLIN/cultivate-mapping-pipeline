@@ -1,30 +1,14 @@
-# ──────────────────────────────────────────────
-# Outputs
-# ──────────────────────────────────────────────
-
-output "database_name" {
-  description = "The Snowflake database name"
-  value       = snowflake_database.cultivate.name
+output "bucket_name" {
+  description = "Name of the S3 bucket"
+  value       = aws_s3_bucket.cultivate.id
 }
 
-output "warehouse_name" {
-  description = "The Snowflake warehouse name"
-  value       = snowflake_warehouse.fsi.name
+output "bucket_arn" {
+  description = "ARN of the S3 bucket"
+  value       = aws_s3_bucket.cultivate.arn
 }
 
-output "schemas" {
-  description = "Map of schema names created"
-  value = {
-    raw = snowflake_schema.raw.name
-  }
+output "bucket_region" {
+  description = "Region of the S3 bucket"
+  value       = aws_s3_bucket.cultivate.region
 }
-
-output "roles" {
-  description = "Custom roles created for RBAC"
-  value = {
-    transformer = snowflake_account_role.transformer.name
-    reader      = snowflake_account_role.reader.name
-    loader      = snowflake_account_role.loader.name
-  }
-}
-

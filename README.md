@@ -24,6 +24,24 @@ Full architecture: [ARCHITECTURE.md](ARCHITECTURE.md) | Design rationale: [DESIG
 
 ---
 
+## Stack evolution
+
+This pipeline has gone through two production stacks. Both are documented in commit history; the codebase shows familiarity with **both Snowflake and DuckDB** ecosystems and with managing AWS infrastructure via **Terraform**.
+
+| | v1 (production) | v2 (current) |
+|---|---|---|
+| **Storage** | Azure Blob Storage | AWS S3 (`cultivate-mapping-data`, `eu-north-1`) |
+| **Warehouse** | Snowflake (CULTIVATE database, RBAC roles) | DuckDB (local file, `httpfs` extension reads S3 directly) |
+| **Transformation** | dbt-snowflake (staging → intermediate → marts) | dbt-duckdb (same model layers) |
+| **IaC** | Terraform — Snowflake provider (DB, warehouse, schemas, roles, storage integration) | Terraform — AWS provider (S3 bucket only) |
+| **Auth** | MFA + key-pair JWT | AWS CLI credentials |
+
+**Why migrate.** Snowflake account access expired and this is the final analytical run on the SHARECITY 100 dataset. DuckDB removes the need for warehouse provisioning, role grants, and storage integrations — `httpfs` reads from S3 directly. The dbt model layer was preserved; only the adapter and SQL dialect changes (e.g. `regexp_substr` → `regexp_extract`) were needed.
+
+**What stayed.** dbt project structure, model lineage, source definitions, and the medallion (Bronze/Silver/Gold) approach are unchanged — proving the warehouse-agnostic design.
+
+---
+
 ## Purpose of this repository
 
 This repository documents the production-grade data automation pipeline that underpins the **Food Sharing Map**, hosted on the **Sharing Solutions** platform  
