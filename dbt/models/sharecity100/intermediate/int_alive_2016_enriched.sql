@@ -45,5 +45,5 @@ select
     m.informal
 
 from {{ ref('int_alive_urls_2016') }} a
-left join {{ ref('stg_manual_2016') }} m
+inner join {{ ref('stg_manual_2016') }} m
     on a.url = m.url

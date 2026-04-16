@@ -34,5 +34,7 @@ select
     e.lng as lon
 
 from {{ ref('int_alive_2016_enriched') }} e
+left join {{ ref('city_aliases') }} a
+    on e.city_key = a.alias_key
 left join {{ ref('stg_city_list') }} c
-    on e.city_key = c.city_key
+    on coalesce(a.canonical_key, e.city_key) = c.city_key

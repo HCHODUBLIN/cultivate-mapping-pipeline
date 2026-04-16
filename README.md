@@ -14,14 +14,23 @@ Architecture overview → [ARCHITECTURE.md](ARCHITECTURE.md) | Data model → [s
 
 ### Component READMEs
 - [terraform/](terraform/README.md) — AWS S3 infrastructure as code
-- [dbt/](dbt/README.md) — dbt project overview
+- [dbt/](dbt/README.md) — dbt project overview (with mermaid lineage)
 - [dbt/models/](dbt/models/README.md) — model layer documentation
 - [dbt/tests/](dbt/tests/README.md) — data quality tests
 - [scripts/](scripts/README.md) — Python utilities and SHARECITY 100 pipeline
 - [snowflake/](snowflake/README.md) — legacy Snowflake SQL (pre-DuckDB migration)
-- [exploration/](exploration/README.md) — prompt engineering and A/B testing
-- [exploration/2024/](exploration/2024/README.md) — early-phase exploration
 - [evaluation/](evaluation/README.md) — F1, precision/recall tracking
+
+### Exploration (per-year experiments)
+- [exploration/](exploration/README.md) — overview
+- [exploration/2024/](exploration/2024/README.md) — early-phase exploration (CIKM 2024 paper)
+- [exploration/2025/01_manual_verification/scripts/](exploration/2025/01_manual_verification/scripts/README.md) — manual verification tooling
+- [exploration/2025/02_automation_improvement/](exploration/2025/02_automation_improvement/README.md) — automation round improvements
+- [exploration/2026/01_duplication/scripts/](exploration/2026/01_duplication/scripts/README.md) — duplication analysis
+- [exploration/2026/02_query_design/scripts/](exploration/2026/02_query_design/scripts/README.md) — query design experiments
+- [exploration/2026/03_landscape_analysis/scripts/](exploration/2026/03_landscape_analysis/scripts/README.md) — landscape analysis
+- [exploration/2026/03_landscape_analysis/DEDUPLICATION_COMPARISON.md](exploration/2026/03_landscape_analysis/DEDUPLICATION_COMPARISON.md) — dedup strategy comparison
+- [exploration/2026/03_landscape_analysis/scripts/DATA_RECOMMENDATIONS.md](exploration/2026/03_landscape_analysis/scripts/DATA_RECOMMENDATIONS.md) — data recommendations
 
 ### Schema & governance
 - [schema/data_model.md](schema/data_model.md) — conceptual + physical data model
