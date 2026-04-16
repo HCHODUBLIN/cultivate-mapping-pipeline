@@ -1,167 +1,82 @@
 version: 2
 
 sources:
-  - name: cultivate
-    description: Bronze tables for CULTIVATE mapping pipeline data
-    database: CULTIVATE
-    schema: HC_LOAD_DATA_FROM_CLOUD
-
+  # ─────────────────────────────────────────────────────────────
+  # CULTIVATE 100 — production FSI mapping (100 cities)
+  # 4 automation rounds + 4 manual verification rounds
+  # ─────────────────────────────────────────────────────────────
+  - name: cultivate100
+    description: |
+      CULTIVATE 100 production dataset (100 cities, ~3,000 FSIs).
+      Each round is a separate snapshot — duplication is expected and
+      handled in the intermediate layer.
     tables:
-      - name: bronze_ground_truth
-        description: Ground truth URLs manually collected
-        columns:
-          - name: ground_truth_id
-            description: Unique identifier for ground truth records
-            tests:
-              - unique
-              - not_null
-          - name: city
-            description: City name
-            tests:
-              - not_null
-          - name: source_url
-            description: Original source URL
-            tests:
-              - not_null
-          - name: file_name
-            description: Source file name
-          - name: loaded_at
-            description: Timestamp when data was loaded
-            tests:
-              - not_null
+      # ── Automation tool outputs (raw discovery)
+      - name: bronze_automation_run01
+        description: Automation tool output, round 1 (one CSV per city)
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/automation/run-01/*.csv', union_by_name=true, filename=true)"
+      - name: bronze_automation_run02
+        description: Automation tool output, round 2
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/automation/run-02/*.csv', union_by_name=true, filename=true)"
+      - name: bronze_automation_run03
+        description: Automation tool output, round 3
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/automation/run-03/*.csv', union_by_name=true, filename=true)"
+      - name: bronze_automation_run04
+        description: Automation tool output, round 4
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/automation/run-04/*.csv', union_by_name=true, filename=true)"
 
-      - name: bronze_automation
-        description: URLs found by automation scripts
-        columns:
-          - name: automation_id
-            description: Unique identifier for automation records
-          - name: city
-            description: City name
-          - name: run_id
-            description: Automation run identifier (includes version)
-          - name: source_url
-            description: Original source URL
-          - name: file_name
-            description: Source file name
-          - name: loaded_at
-            description: Timestamp when data was loaded
+      # ── Manual verification (human-reviewed FSIs)
+      - name: bronze_verified_run01
+        description: Human-verified FSIs, round 1 (one CSV per city)
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/manual_verified/run-01/*.csv', union_by_name=true, filename=true)"
+      - name: bronze_verified_run02
+        description: Human-verified FSIs, round 2
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/manual_verified/run-02/*.csv', union_by_name=true, filename=true)"
+      - name: bronze_verified_run03
+        description: Human-verified FSIs, round 3
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/manual_verified/run-03/*.csv', union_by_name=true, filename=true)"
+      - name: bronze_verified_run04
+        description: Human-verified FSIs, round 4
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/manual_verified/run-04/*.csv', union_by_name=true, filename=true)"
 
-      - name: bronze_automation_reviewed
-        description: Review decisions for automation results
-        columns:
-          - name: automation_id
-            description: Links to bronze_automation
-          - name: is_included
-            description: Whether URL should be included (TRUE/FALSE as string)
-          - name: file_name
-            description: Source file name
-          - name: loaded_at
-            description: Timestamp when data was loaded
+  # ─────────────────────────────────────────────────────────────
+  # SHARECITY 100 — three datasets across different years
+  # Pipeline: raw URLs → deadlink_check_results → scraped → classified
+  # ─────────────────────────────────────────────────────────────
+  - name: sharecity100
+    description: |
+      SHARECITY 100 priority-4 city data, organised by year of collection:
+      - 2016: legacy manual mapping (oldweb)
+      - 2024: automation tool + scraping + LLM classification
+      - 2026 (future): re-run with updated automation tool
+    tables:
+      # ── 2016 — legacy manual mapping
+      - name: deadlink_2016
+        description: 2016 oldweb dead link check results (2581 alive)
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/deadlink.csv"
 
-      - name: bronze_city_language
-        description: Language mapping for each city
-        columns:
-          - name: city
-            description: City name
-          - name: search_language
-            description: Primary search language for the city
-          - name: file_name
-            description: Source file name
-          - name: loaded_at
-            description: Timestamp when data was loaded
-      - name: bronze_blob_inventory
-        description: Azure Blob file inventory from stage LIST output.
-        columns:
-          - name: file_path
-            description: Full blob path from stage LIST output
-            tests:
-              - not_null
-          - name: size_bytes
-            description: Blob size in bytes
-          - name: md5
-            description: Blob MD5 hash
-          - name: last_modified
-            description: Blob last modified timestamp
+      # ── 2024 — automation pipeline
+      - name: deadlink_2024
+        description: 2024 automation dead link check results (5093 alive)
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2024/deadlink.csv"
+      - name: scraped_2024
+        description: 2024 BeautifulSoup-extracted text from alive URLs
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2024/scraped.csv"
+      - name: classified_2024
+        description: 2024 gpt-5-nano FSI classification (using pre-scraped text)
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2024/classified.csv"
 
-      - name: bronze_fsi_verified
-        description: |
-          Verified FSI dataset (renamed from GOLD_FSI_200226).
-          Contains enriched FSI records with name, URL, social media links,
-          coordinates, and sharing activity classification.
-        columns:
-          - name: id
-            description: FSI record identifier
-          - name: city
-            description: City name
-          - name: country
-            description: Country name
-          - name: name
-            description: FSI name
-          - name: url
-            description: Canonical website URL
-          - name: facebook_url
-            description: Facebook page URL
-          - name: twitter_url
-            description: Twitter/X profile URL
-          - name: instagram_url
-            description: Instagram profile URL
-          - name: food_sharing_activities
-            description: JSON array of food sharing activity types
-          - name: how_it_is_shared
-            description: Comma-separated sharing modes (raw values)
-          - name: lat
-            description: Latitude coordinate
-          - name: lon
-            description: Longitude coordinate
-
-      - name: bronze_tracker_run01
-        description: |
-          Run-01 ShareCity tracker content from ShareCity200Tracker.xlsx.
-          One row per city with planning and QA metadata.
-        columns:
-          - name: region
-            description: World region
-          - name: country
-            description: Country name
-          - name: city
-            description: City name
-          - name: language
-            description: Primary language
-          - name: sharecity_tier
-            description: ShareCity scope (e.g., SC100/SC200)
-          - name: hub_or_spoke
-            description: Hub/spoke designation
-          - name: priority
-            description: Priority level
-          - name: dcu_fsi_search_plan_week_commencing
-            description: DCU search plan week commencing date
-          - name: tcd_manual_check_plan_week_commencing
-            description: TCD manual check week commencing date
-          - name: data_entry_size_before_manual_checking
-            description: Entry count before manual checking
-          - name: manual_review_checker_assigned
-            description: Assigned reviewer
-          - name: fsis_searched
-            description: Search completion status
-          - name: data_reviewed
-            description: Review completion status
-          - name: data_uploaded
-            description: Upload completion status
-          - name: automation_tool_version
-            description: Tool version used
-          - name: comments
-            description: Free-text comments
-          - name: valid_fsi
-            description: Count of valid FSIs
-          - name: accuracy_rate
-            description: Accuracy percentage text
-          - name: correct_name
-            description: Count of correctly named rows
-          - name: name_accuracy_rate
-            description: Name accuracy percentage text
-          - name: file_name
-            description: Source filename used for ingestion
-          - name: loaded_at
-            description: Row ingestion timestamp
-
-
+      # ── 2026 (future) — placeholder for re-run
+      # - name: deadlink_2026
