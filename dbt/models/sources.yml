@@ -2,6 +2,21 @@ version: 2
 
 sources:
   # ─────────────────────────────────────────────────────────────
+  # Metadata — cross-dataset reference tables
+  # ─────────────────────────────────────────────────────────────
+  - name: metadata
+    description: Cross-dataset metadata (city lookups, run trackers)
+    tables:
+      - name: city_list
+        description: City → Country / Region / Priority lookup (SHARECITY 100 master list)
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/metadata/city_list.csv"
+      - name: sharecity200_tracker
+        description: ShareCity 200 run tracker (planning + QA metadata per city)
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/metadata/sharecity200_tracker.csv"
+
+  # ─────────────────────────────────────────────────────────────
   # CULTIVATE 100 — production FSI mapping (100 cities)
   # 4 automation rounds + 4 manual verification rounds
   # ─────────────────────────────────────────────────────────────
@@ -59,6 +74,10 @@ sources:
       - 2026 (future): re-run with updated automation tool
     tables:
       # ── 2016 — legacy manual mapping
+      - name: manual_2016
+        description: 2016 SHARECITY 100 manual mapping (original FSI data with food activities)
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/manual_mapping.csv"
       - name: deadlink_2016
         description: 2016 oldweb dead link check results (2581 alive)
         meta:

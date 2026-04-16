@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: stg_manual_2016
+    description: 2016 SHARECITY 100 manual mapping (raw, all 30 columns)
+    columns:
+      - name: id
+        description: Original FSI identifier from manual mapping
+        tests:
+          - unique
+          - not_null
+      - name: url
+        description: FSI website URL
+        tests:
+          - not_null
+      - name: cityName
+        description: City name
+        tests:
+          - not_null
+
+  - name: stg_deadlink_2016
+    description: HTTP status check on 2016 manual mapping URLs
+    columns:
+      - name: url
+        tests:
+          - not_null
+      - name: status_code
+        tests:
+          - not_null
+      - name: alive
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+
+  - name: stg_deadlink_2024
+    description: HTTP status check on 2024 run-01 automation URLs
+    columns:
+      - name: url
+        tests:
+          - not_null
+      - name: status_code
+        tests:
+          - not_null
+      - name: alive
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+
+  - name: stg_scraped_2024
+    description: BeautifulSoup-extracted text from alive 2024 URLs
+    columns:
+      - name: url
+        tests:
+          - not_null

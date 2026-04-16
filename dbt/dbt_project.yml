@@ -17,6 +17,9 @@ clean-targets:
 
 models:
   cultivate:
+    metadata:
+      +schema: metadata
+      +materialized: view
     cultivate100:
       +schema: cultivate100
       staging:
