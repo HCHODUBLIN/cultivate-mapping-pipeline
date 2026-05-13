@@ -82,6 +82,10 @@ sources:
         description: 2016 oldweb dead link check results (2581 alive)
         meta:
           external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/deadlink.csv"
+      - name: geocoded_2016
+        description: 2016 FSIs geocoded via Google Places Text Search (lat/lng + match similarity)
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/geocoded.csv"
 
       # ── 2024 — automation pipeline
       - name: deadlink_2024

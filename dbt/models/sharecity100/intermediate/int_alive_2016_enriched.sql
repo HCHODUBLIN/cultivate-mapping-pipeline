@@ -46,4 +46,4 @@ select
 
 from {{ ref('int_alive_urls_2016') }} a
 inner join {{ ref('stg_manual_2016') }} m
-    on a.url = m.url
+    on a.id = m.id
