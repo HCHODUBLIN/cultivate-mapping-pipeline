@@ -1,4 +1,6 @@
--- Transforms 2016 SHARECITY 100 manual mapping into CULTIVATE 100 schema.
+-- Mart: 2016 SHARECITY 100 FSIs, schema-aligned with CULTIVATE 100.
+--
+-- Final product for the 2016 historical dataset. Materialized as a table.
 -- Boolean resource columns → Growing / Cooking & Eating / Distribution
 -- Boolean sharing columns   → Collecting / Gifting / Bartering / Selling
 -- Country looked up from metadata.city_list (cityRegion is a broad region, not a country).

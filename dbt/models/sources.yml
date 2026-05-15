@@ -99,7 +99,7 @@ sources:
       - name: classified_2024
         description: 2024 gpt-5-nano FSI classification (using pre-scraped text)
         meta:
-          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2024/classified.csv"
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/sharecity100/2024/classified.csv', header=true, quote='\"', escape='\"', strict_mode=false, ignore_errors=true)"
 
       # ── 2026 (future) — placeholder for re-run
       # - name: deadlink_2026
