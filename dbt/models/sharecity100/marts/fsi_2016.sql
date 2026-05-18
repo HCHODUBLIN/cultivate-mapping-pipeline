@@ -102,18 +102,13 @@ select
     date_checked,
     comments,
 
-    -- Final coords: similarity>0.5 AND not a geographic outlier (>70km from city median)
-    case
-        when dist_from_city_median_km is null or dist_from_city_median_km <= 70 then raw_lat
-    end as lat,
-    case
-        when dist_from_city_median_km is null or dist_from_city_median_km <= 70 then raw_lon
-    end as lon,
+    raw_lat as lat,
+    raw_lon as lon,
 
     -- traceability
     geocode_similarity,
     geocode_confidence,
-    dist_from_city_median_km,
-    coalesce(dist_from_city_median_km > 70, false) as is_geo_outlier
+    dist_from_city_median_km
 
 from with_distance
+where coalesce(dist_from_city_median_km, 0) <= 70  -- drop geo outliers entirely
