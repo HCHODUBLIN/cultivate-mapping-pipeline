@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_automation_run01
+    description: Automation tool output, round 1 (raw CSV columns).
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]
+  - name: stg_automation_run02
+    description: Automation tool output, round 2.
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]
+  - name: stg_automation_run03
+    description: Automation tool output, round 3.
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]
+  - name: stg_automation_run04
+    description: Automation tool output, round 4.
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]
+  - name: stg_verified_run01
+    description: Human-verified FSIs, round 1.
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]
+  - name: stg_verified_run02
+    description: Human-verified FSIs, round 2.
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]
+  - name: stg_verified_run03
+    description: Human-verified FSIs, round 3.
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]
+  - name: stg_verified_run04
+    description: Human-verified FSIs, round 4.
+    columns:
+      - name: URL
+        quote: true
+        tests: [not_null]

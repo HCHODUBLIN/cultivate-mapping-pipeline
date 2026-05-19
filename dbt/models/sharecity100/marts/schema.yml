@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: fsi_2016
+    description: 2016 SHARECITY 100 FSIs, CULTIVATE 100 schema, geo-validated.
+    columns:
+      - name: id
+        tests:
+          - unique
+          - not_null
+      - name: city
+        tests:
+          - not_null
+      - name: name
+        tests:
+          - not_null
+      - name: url
+        tests:
+          - not_null
+
+  - name: fsi_2024
+    description: 2024 LLM-validated FSIs, deduped per (city, url), geo-validated.
+    columns:
+      - name: city
+        tests:
+          - not_null
+      - name: name
+        tests:
+          - not_null
+      - name: url
+        tests:
+          - not_null
+
+  - name: fsi_sharecity100
+    description: Unified 2016 + 2024 SHARECITY 100 dataset (2016 priority).
+    columns:
+      - name: dataset_year
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [sc2016, sc2024]
+      - name: city
+        tests:
+          - not_null
+      - name: name
+        tests:
+          - not_null
+      - name: url
+        tests:
+          - not_null

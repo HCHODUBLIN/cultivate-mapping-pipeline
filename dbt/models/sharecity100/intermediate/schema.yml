@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: int_alive_urls_2016
+    description: One row per 2016 FSI id whose URL is alive.
+    columns:
+      - name: id
+        tests:
+          - unique
+          - not_null
+      - name: url
+        tests:
+          - not_null
+
+  - name: int_alive_2016_enriched
+    description: Alive 2016 FSIs joined with manual mapping columns.
+    columns:
+      - name: id
+        tests:
+          - unique
+          - not_null
+      - name: url
+        tests:
+          - not_null
+
+  - name: int_2016_2024_overlap
+    description: Same-city 2016↔2024 similarity matches.
+    columns:
+      - name: match_strength
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [exact, strong, medium, weak]
+
+  - name: int_2024_to_classify
+    description: 2024 candidate URLs still needing LLM classification.
+    columns:
+      - name: url
+        tests:
+          - not_null

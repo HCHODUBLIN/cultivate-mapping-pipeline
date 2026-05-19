@@ -1,0 +1,56 @@
+name: dbt CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'dbt/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dbt/**'
+
+permissions:
+  contents: read
+
+jobs:
+  sql-lint:
+    name: SQL Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install sqlfluff
+        run: pip install sqlfluff
+      - name: Lint SQL (non-blocking)
+        run: |
+          sqlfluff lint dbt/models/ --dialect duckdb --exclude-rules LT05,LT12 || true
+          echo "::notice::SQL lint completed (warnings only)"
+
+  dbt-parse:
+    name: dbt Parse
+    runs-on: ubuntu-latest
+    needs: sql-lint
+    defaults:
+      run:
+        working-directory: dbt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dbt-duckdb
+        run: pip install dbt-duckdb
+      - name: dbt deps
+        run: dbt deps
+      - name: dbt parse
+        run: dbt parse
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/dbt/ci
+
+# Note: no dbt run/build — models read from S3 via httpfs, which would need
+# AWS credentials. CI only validates SQL style and project structure
+# (refs/sources/macros compile). Models are run locally / manually.

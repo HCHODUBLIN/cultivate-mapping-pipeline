@@ -1,0 +1,9 @@
+# CI-only profile. `dbt parse` needs a profile to load the adapter but does
+# not connect to a database or read from S3. The DuckDB path is in-memory.
+cultivate:
+  target: ci
+  outputs:
+    ci:
+      type: duckdb
+      path: ":memory:"
+      threads: 1

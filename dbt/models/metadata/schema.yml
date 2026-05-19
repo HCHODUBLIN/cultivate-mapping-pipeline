@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: stg_city_list
+    description: City → Country/Region/Priority lookup with a normalized city_key.
+    columns:
+      - name: city_key
+        description: Accent/punctuation-stripped city key — join key into FSI models.
+        tests:
+          - unique
+          - not_null
+      - name: city
+        description: City name
+        tests:
+          - not_null
+      - name: country
+        description: Country name
+        tests:
+          - not_null
