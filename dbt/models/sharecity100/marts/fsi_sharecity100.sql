@@ -1,10 +1,9 @@
--- Mart: SHARECITY 100 unified FSI dataset (2016 + 2024).
+-- Mart: SHARECITY 100 unified FSI dataset (2016 + 2024) — public schema.
 --
 -- Combines fsi_2016 (manual mapping) with fsi_2024 (automation + LLM).
--- 2016 takes priority — when the same FSI URL appears in both years (within
--- the same city, exact or near-identical URL), the 2024 row is dropped.
---
--- A `dataset_year` column tags the source year for downstream filtering.
+-- 2016 takes priority — when the same FSI URL appears in both years (same
+-- city, exact or near-identical URL), the 2024 row is dropped.
+-- `datasetYear` tags the source year for downstream filtering.
 
 with norm as (
     select
@@ -43,38 +42,18 @@ dup_2024_urls as (
 )
 
 select
-    'sc2016' as dataset_year,
-    city,
-    country,
-    name,
-    url,
-    facebook_url,
-    twitter_url,
-    instagram_url,
-    food_sharing_activities,
-    how_it_is_shared,
-    date_checked,
-    comments,
-    lat,
-    lon
+    'sc2016' as "datasetYear",
+    name, url, "facebookUrl", "twitterUrl", "instagramUrl",
+    "foodSharingActivities", "howItIsShared",
+    country, city, latitude, longitude, "dateChecked"
 from {{ ref('fsi_2016') }}
 
 union all
 
 select
-    'sc2024' as dataset_year,
-    city,
-    country,
-    name,
-    url,
-    facebook_url,
-    twitter_url,
-    instagram_url,
-    food_sharing_activities,
-    how_it_is_shared,
-    date_checked,
-    comments,
-    lat,
-    lon
+    'sc2024' as "datasetYear",
+    name, url, "facebookUrl", "twitterUrl", "instagramUrl",
+    "foodSharingActivities", "howItIsShared",
+    country, city, latitude, longitude, "dateChecked"
 from {{ ref('fsi_2024') }}
 where url not in (select url_2024 from dup_2024_urls)

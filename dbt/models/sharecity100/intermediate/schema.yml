@@ -39,3 +39,21 @@ models:
       - name: url
         tests:
           - not_null
+
+  - name: int_fsi_2016
+    description: 2016 FSIs with full traceability (id, comments, geocode_*).
+    columns:
+      - name: id
+        tests:
+          - unique
+          - not_null
+      - name: url
+        tests:
+          - not_null
+
+  - name: int_fsi_2024
+    description: 2024 LLM-valid FSIs with QA columns (comments, distance).
+    columns:
+      - name: url
+        tests:
+          - not_null

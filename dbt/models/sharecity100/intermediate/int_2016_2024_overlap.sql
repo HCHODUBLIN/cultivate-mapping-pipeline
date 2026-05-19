@@ -36,7 +36,7 @@ with d2016 as (
         ) as domain,
         name,
         url
-    from {{ ref('fsi_2016') }}
+    from {{ ref('int_fsi_2016') }}
     where url is not null
 ),
 
