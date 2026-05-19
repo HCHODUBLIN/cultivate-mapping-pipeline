@@ -1,21 +1,14 @@
-name: Snowflake CI
+# ─────────────────────────────────────────────────────────────────────────
+# ARCHIVED — Snowflake era (pre-DuckDB migration).
+# Kept for portfolio/historical reference: shows the Snowflake CI/CD that
+# ran when the warehouse was Snowflake. Auto-triggers are disabled; this
+# workflow only runs on manual dispatch and is not expected to pass without
+# the original Snowflake secrets.
+# ─────────────────────────────────────────────────────────────────────────
+name: Snowflake CI (archived)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'dbt/models/**'
-      - 'snowflake/**'
-      - 'dbt/dbt_project.yml'
-      - 'dbt/packages.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'dbt/models/**'
-      - 'snowflake/**'
-      - 'dbt/dbt_project.yml'
-      - 'dbt/packages.yml'
 
 jobs:
   # Job 1: SQL Lint (always runs)
