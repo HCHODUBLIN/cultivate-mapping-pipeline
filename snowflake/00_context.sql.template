@@ -1,9 +1,0 @@
--- 00_context.sql.template
--- Copy to 00_context.sql and replace <YOUR_USERNAME> with your Snowflake username
-
-USE ROLE ACCOUNTADMIN;
-USE WAREHOUSE FSI_WH;
-USE DATABASE CULTIVATE;
-
--- Replace <YOUR_USERNAME> with your Snowflake username
-USE SCHEMA <YOUR_USERNAME>_LOAD_DATA_FROM_CLOUD;

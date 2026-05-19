@@ -174,7 +174,7 @@ def main():
 
     results = list(existing)
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        for i, (row, geo) in enumerate(zip(todo, pool.map(process, todo)), start=1):
+        for i, (row, geo) in enumerate(zip(todo, pool.map(process, todo), strict=True), start=1):
             place_id, matched_name, similarity, lat, lng = geo
             results.append({
                 "id": row.get(args.id_col),

@@ -6,7 +6,7 @@ of CSVs (`--input-prefix s3://bucket/folder/`). Results are written to
 `--output s3://bucket/report.csv` with columns: city, name, url,
 status_code, alive.
 
-Alive = HTTP 200–399, or 403/405/406 (servers that block HEAD but are live).
+Alive = HTTP 200-399, or 403/405/406 (servers that block HEAD but are live).
 
 Usage:
     python scripts/check_dead_links.py \\
@@ -122,7 +122,7 @@ def main():
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerow(["city", "name", "url", "status_code", "alive"])
-    for (city, name, url), status in zip(records, statuses):
+    for (city, name, url), status in zip(records, statuses, strict=True):
         writer.writerow([city, name, url, status, is_alive(status)])
     s3.put_object(Bucket=out_bucket, Key=out_key, Body=buf.getvalue().encode("utf-8"))
     print(f"Saved: s3://{out_bucket}/{out_key}", file=sys.stderr)

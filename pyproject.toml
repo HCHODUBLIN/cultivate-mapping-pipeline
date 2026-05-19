@@ -38,7 +38,7 @@ pythonpath = ["scripts"]
 [tool.ruff]
 target-version = "py312"
 line-length = 120
-src = ["ingestion", "evaluation", "scripts", "utils", "tests"]
+src = ["scripts", "evaluation", "exploration"]
 
 [tool.ruff.lint]
 select = [
@@ -57,7 +57,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["ingestion", "evaluation", "utils"]
+known-first-party = ["scripts", "evaluation"]
 
 [tool.ruff.format]
 quote-style = "double"

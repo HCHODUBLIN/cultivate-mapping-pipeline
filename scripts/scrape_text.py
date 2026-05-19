@@ -103,7 +103,7 @@ def main():
 
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         for i, ((city, name, url), (title, text)) in enumerate(
-            zip(todo, pool.map(lambda t: scrape(t[2]), todo)), start=1
+            zip(todo, pool.map(lambda t: scrape(t[2]), todo), strict=True), start=1
         ):
             results.append({
                 "city": city, "name": name, "url": url,
