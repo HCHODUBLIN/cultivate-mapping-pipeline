@@ -14,6 +14,16 @@ with names_dedup as (
     where local_name is not null
 ),
 
+regeo as (
+    -- non-English FSIs re-geocoded with the local-language name
+    select
+        cast(id as varchar)        as id,
+        cast(similarity as double) as similarity,
+        cast(lat as double)        as lat,
+        cast(lng as double)        as lng
+    from {{ source('sharecity100', 'regeocoded_2016') }}
+),
+
 normalized as (
     select
         e.id,
@@ -46,14 +56,18 @@ normalized as (
         cast(null as date) as date_checked,
         e.additionalInfo as comments,
 
-        case when g.similarity > 0.5 then g.lat end as raw_lat,
-        case when g.similarity > 0.5 then g.lng end as raw_lon,
-        g.similarity as geocode_similarity,
+        -- non-English FSIs were re-geocoded with the local-language name;
+        -- prefer that result, fall back to the original English-name geocode
+        case when coalesce(rg.similarity, g.similarity) > 0.5
+             then coalesce(rg.lat, g.lat) end as raw_lat,
+        case when coalesce(rg.similarity, g.similarity) > 0.5
+             then coalesce(rg.lng, g.lng) end as raw_lon,
+        coalesce(rg.similarity, g.similarity) as geocode_similarity,
         case
-            when g.similarity is null then 'no_match'
-            when g.similarity > 0.7   then 'high'
-            when g.similarity > 0.5   then 'medium'
-            else                           'low'
+            when coalesce(rg.similarity, g.similarity) is null then 'no_match'
+            when coalesce(rg.similarity, g.similarity) > 0.7   then 'high'
+            when coalesce(rg.similarity, g.similarity) > 0.5   then 'medium'
+            else                                                    'low'
         end as geocode_confidence
 
     from {{ ref('int_alive_2016_enriched') }} e
@@ -63,6 +77,8 @@ normalized as (
         on coalesce(a.canonical_key, e.city_key) = c.city_key
     left join {{ ref('stg_geocoded_2016') }} g
         on cast(e.id as varchar) = g.id
+    left join regeo rg
+        on cast(e.id as varchar) = rg.id
     left join names_dedup n
         on e.url = n.url
 ),

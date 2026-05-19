@@ -83,9 +83,13 @@ sources:
         meta:
           external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/deadlink.csv"
       - name: geocoded_2016
-        description: 2016 FSIs geocoded via Google Places Text Search (lat/lng + match similarity)
+        description: 2016 FSIs geocoded via Google Places Text Search (English name)
         meta:
           external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/geocoded.csv"
+      - name: regeocoded_2016
+        description: Non-English 2016 FSIs re-geocoded with local-language name
+        meta:
+          external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/regeocoded.csv"
       - name: scraped_2016
         description: 2016 alive-URL page text + <title> (BeautifulSoup)
         meta:
