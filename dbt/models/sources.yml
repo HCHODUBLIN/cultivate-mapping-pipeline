@@ -86,6 +86,14 @@ sources:
         description: 2016 FSIs geocoded via Google Places Text Search (lat/lng + match similarity)
         meta:
           external_location: "s3://cultivate-mapping-data/raw/sharecity100/2016/geocoded.csv"
+      - name: scraped_2016
+        description: 2016 alive-URL page text + <title> (BeautifulSoup)
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/sharecity100/2016/scraped.csv', header=true, quote='\"', escape='\"', strict_mode=false, ignore_errors=true)"
+      - name: names_2016
+        description: 2016 local-language FSI names extracted from scraped content (gpt-5-nano)
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/sharecity100/2016/names.csv', header=true, quote='\"', escape='\"', strict_mode=false, ignore_errors=true)"
 
       # ── 2024 — automation pipeline
       - name: deadlink_2024
