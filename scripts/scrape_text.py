@@ -53,7 +53,10 @@ def scrape(url: str, timeout: int = 15) -> tuple[str, str]:
     try:
         r = requests.get(url, timeout=timeout, headers={"User-Agent": "Mozilla/5.0"})
         r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
+        # Pass raw bytes so BeautifulSoup detects the charset from the
+        # <meta> tag — requests' r.text mis-guesses non-UTF-8 pages
+        # (e.g. EUC-KR Korean sites became mojibake).
+        soup = BeautifulSoup(r.content, "html.parser")
         title = soup.title.string.strip() if soup.title and soup.title.string else ""
         for tag in soup(["script", "style", "nav", "footer", "header"]):
             tag.decompose()

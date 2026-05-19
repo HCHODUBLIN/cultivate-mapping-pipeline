@@ -10,12 +10,21 @@
 --   2. the point is within 70km of the city's FSI median (catches false-positive
 --      matches on globally-named orgs like "Local Harvest" pointing to the US).
 
-with normalized as (
+with names_dedup as (
+    -- one local_name per URL (same URL can appear under many cities)
+    select distinct on (url) url, local_name
+    from {{ source('sharecity100', 'names_2016') }}
+    where local_name is not null
+),
+
+normalized as (
     select
         e.id,
         e.city,
         c.country,
-        e.name,
+        -- prefer the initiative's own local-language name (extract_names.py),
+        -- fall back to the 2016 English name when extraction had no result
+        coalesce(nullif(n.local_name, ''), e.name) as name,
         e.url,
         e.facebook as facebook_url,
         e.twitter as twitter_url,
@@ -57,6 +66,8 @@ with normalized as (
         on coalesce(a.canonical_key, e.city_key) = c.city_key
     left join {{ ref('stg_geocoded_2016') }} g
         on cast(e.id as varchar) = g.id
+    left join names_dedup n
+        on e.url = n.url
 ),
 
 city_medians as (
