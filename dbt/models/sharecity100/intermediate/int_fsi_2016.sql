@@ -27,7 +27,9 @@ regeo as (
 normalized as (
     select
         e.id,
-        e.city,
+        -- canonical city from master (US "City (StateAbbr)"); fall back to
+        -- the source value when the city isn't in master
+        coalesce(c.city, e.city) as city,
         c.country,
         -- prefer the initiative's own local-language name (extract_names.py),
         -- fall back to the 2016 English name when extraction had no result

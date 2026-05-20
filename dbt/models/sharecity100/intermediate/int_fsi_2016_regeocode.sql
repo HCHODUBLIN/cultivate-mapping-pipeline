@@ -6,19 +6,12 @@
 -- feed that to Google Places for this subset. English-speaking cities keep
 -- their original geocode.
 
-with tracker_lang as (
-    select distinct
-        {{ normalize_city('"City"') }} as city_key,
-        "Language"                     as language
-    from {{ source('metadata', 'sharecity200_tracker') }}
-)
-
 select
     e.id,
     e.name,
     e.city,
     e.country
 from {{ ref('int_fsi_2016') }} e
-left join tracker_lang t
-    on {{ normalize_city('e.city') }} = t.city_key
-where coalesce(t.language, 'English') <> 'English'
+left join {{ ref('stg_city_list') }} m
+    on {{ normalize_city('e.city') }} = m.city_key
+where coalesce(m.language, 'English') <> 'English'

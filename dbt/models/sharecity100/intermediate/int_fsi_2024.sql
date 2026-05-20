@@ -8,22 +8,26 @@
 
 with base as (
     select distinct on (a."City", a."URL")
-        a."City"                       as city,
-        a."Country"                    as country,
-        a."Name"                       as name,
-        a."URL"                        as url,
-        a."Facebook URL"               as facebook_url,
-        a."Twitter URL"                as twitter_url,
-        a."Instagram URL"              as instagram_url,
-        a."Food Sharing Activities"    as food_sharing_activities,
-        a."How it is Shared"           as how_it_is_shared,
-        a."Date Checked"               as date_checked,
-        a."Comments"                   as comments,
-        a."Lat"                        as raw_lat,
-        a."Lon"                        as raw_lon
+        -- canonical city + country from master (single source of truth);
+        -- fall back to the automation values when the city isn't in master
+        coalesce(m.city,    a."City")    as city,
+        coalesce(m.country, a."Country") as country,
+        a."Name"                         as name,
+        a."URL"                          as url,
+        a."Facebook URL"                 as facebook_url,
+        a."Twitter URL"                  as twitter_url,
+        a."Instagram URL"                as instagram_url,
+        a."Food Sharing Activities"      as food_sharing_activities,
+        a."How it is Shared"             as how_it_is_shared,
+        a."Date Checked"                 as date_checked,
+        a."Comments"                     as comments,
+        a."Lat"                          as raw_lat,
+        a."Lon"                          as raw_lon
     from {{ ref('stg_automation_run01') }} a
     inner join {{ ref('stg_classified_2024') }} c
         on a."URL" = c.url
+    left join {{ ref('stg_city_list') }} m
+        on {{ normalize_city('a."City"') }} = m.city_key
     where c.is_valid_fsi = true
     order by a."City", a."URL", a."Name"
 ),
