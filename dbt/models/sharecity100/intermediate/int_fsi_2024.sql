@@ -1,7 +1,12 @@
 -- Intermediate: 2024 SHARECITY 100 FSIs with full traceability.
 --
--- Automation tool output filtered to LLM-valid URLs, deduped per (city, url).
--- The same URL may appear under multiple cities (legit multi-city orgs).
+-- Automation tool output filtered to LLM-valid URLs. Deduped twice:
+--   1. per (city, url) — exact URL repeats
+--   2. per (city, root_domain) — same org listed under different URL paths /
+--      subdomains in the same city (e.g. volunteer.x.org vs www.x.org); the
+--      shortest URL (closest to root) is kept. Different root domains with
+--      similar names (Tokyo ward food banks) are correctly kept separate.
+-- Same URL may still appear under multiple cities (legit multi-city orgs).
 -- Geographic outliers (>70km from the city's FSI median) are dropped.
 -- Keeps comments / dist_from_city_median_km for QA; fsi_2024 mart selects the
 -- clean public subset from this.
@@ -29,7 +34,16 @@ with base as (
     left join {{ ref('stg_city_list') }} m
         on {{ normalize_city('a."City"') }} = m.city_key
     where c.is_valid_fsi = true
+      and m.sharecity_tier = 'SC100'  -- drop SC200 cities (multi-city orgs)
     order by a."City", a."URL", a."Name"
+),
+
+domain_dedup as (
+    -- one row per (city, root_domain); keep the shortest URL (closest to root)
+    select distinct on (city, {{ url_root_domain('url') }})
+        *
+    from base
+    order by city, {{ url_root_domain('url') }}, length(url)
 ),
 
 city_medians as (
@@ -37,7 +51,7 @@ city_medians as (
         city,
         median(raw_lat) as median_lat,
         median(raw_lon) as median_lon
-    from base
+    from domain_dedup
     where raw_lat is not null
       and raw_lon is not null
     group by city
@@ -56,7 +70,7 @@ with_distance as (
               + power((b.raw_lon - cm.median_lon) * 111.0 * cos(radians(cm.median_lat)), 2)
             )
         end as dist_from_city_median_km
-    from base b
+    from domain_dedup b
     left join city_medians cm using (city)
 )
 

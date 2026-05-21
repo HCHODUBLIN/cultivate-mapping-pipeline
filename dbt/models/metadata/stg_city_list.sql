@@ -11,11 +11,12 @@
 
 with tracker as (
     select
-        "Region"   as region,
-        "Country"  as country_raw,
-        "City"     as city_raw,
-        "Language" as language,
-        "Priority" as priority
+        "Region"                 as region,
+        "Country"                as country_raw,
+        "City"                   as city_raw,
+        "Language"               as language,
+        "Priority"               as priority,
+        "SHARECITY100 OR 200?"   as sharecity_tier
     from {{ source('metadata', 'sharecity200_tracker') }}
     where nullif(trim("City"), '') is not null  -- drop trailing blank rows
 ),
@@ -47,6 +48,7 @@ select
 
     language,
     priority,
+    sharecity_tier,
     {{ normalize_city('city_raw') }} as city_key
 
 from us_split
