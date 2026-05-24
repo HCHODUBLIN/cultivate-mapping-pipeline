@@ -108,6 +108,12 @@ sources:
         description: 2024 BeautifulSoup-extracted text from alive URLs
         meta:
           external_location: "s3://cultivate-mapping-data/raw/sharecity100/2024/scraped.csv"
+      # ── 2026 — new manual search exports (production-schema CSVs)
+      - name: searched_2026
+        description: 2026 new search results — one CSV per city, production export schema
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/sharecity100/2026/raw_exports/*.csv', header=true, quote='\"', escape='\"', strict_mode=false, ignore_errors=true, union_by_name=true)"
+
       - name: classified_2024
         description: 2024 gpt-5-nano FSI classification (using pre-scraped text)
         meta:
