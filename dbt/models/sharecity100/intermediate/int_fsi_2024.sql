@@ -11,13 +11,23 @@
 -- Keeps comments / dist_from_city_median_km for QA; fsi_2024 mart selects the
 -- clean public subset from this.
 
-with base as (
+with names_dedup as (
+    -- one local_name per URL (extract_names recovered the org's own name
+    -- from the scraped page; replaces the automation tool's noisy name)
+    select distinct on (url) url, local_name
+    from {{ source('sharecity100', 'names_2024') }}
+    where local_name is not null
+),
+
+base as (
     select distinct on (a."City", a."URL")
         -- canonical city + country from master (single source of truth);
         -- fall back to the automation values when the city isn't in master
         coalesce(m.city,    a."City")    as city,
         coalesce(m.country, a."Country") as country,
-        a."Name"                         as name,
+        -- prefer the initiative's own local-language name; fall back to the
+        -- automation name when extract_names had no result for this URL
+        coalesce(nullif(n.local_name, ''), a."Name") as name,
         a."URL"                          as url,
         a."Facebook URL"                 as facebook_url,
         a."Twitter URL"                  as twitter_url,
@@ -33,6 +43,8 @@ with base as (
         on a."URL" = c.url
     left join {{ ref('stg_city_list') }} m
         on {{ normalize_city('a."City"') }} = m.city_key
+    left join names_dedup n
+        on a."URL" = n.url
     where c.is_valid_fsi = true
       and m.sharecity_tier = 'SC100'  -- drop SC200 cities (multi-city orgs)
     order by a."City", a."URL", a."Name"

@@ -114,6 +114,10 @@ sources:
         meta:
           external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/sharecity100/2026/raw_exports/*.csv', header=true, quote='\"', escape='\"', strict_mode=false, ignore_errors=true, union_by_name=true)"
 
+      - name: names_2024
+        description: 2024 local-language FSI names extracted from scraped content (gpt-5-nano)
+        meta:
+          external_location: "read_csv_auto('s3://cultivate-mapping-data/raw/sharecity100/2024/names.csv', header=true, quote='\"', escape='\"', strict_mode=false, ignore_errors=true)"
       - name: classified_2024
         description: 2024 gpt-5-nano FSI classification (using pre-scraped text)
         meta:
